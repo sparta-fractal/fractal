@@ -40,12 +40,11 @@ public class AuthService implements AuthServiceApi {
 
     @Override
     public AuthResponse login(AuthLoginRequest authLoginRequest) {
-        User user = userRepository.findByEmail(authLoginRequest.email()).orElseThrow(
-                () -> new IllegalArgumentException("가입되지 않은 유저입니다."));
+        User user = userRepository.findByEmail(authLoginRequest.email()).orElse(null);
 
         // 로그인 시 이메일과 비밀번호가 일치하지 않을 경우 401을 반환합니다.
-        if (!passwordEncoder.matches(authLoginRequest.password(), user.getPassword())) {
-            throw new IllegalArgumentException("잘못된 비밀번호입니다.");
+        if (user == null || !passwordEncoder.matches(authLoginRequest.password(), user.getPassword())) {
+            throw new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다.");
         }
 
         String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname());
