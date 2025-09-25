@@ -21,17 +21,18 @@ public class JwtFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        System.out.println("JwtFilter init");
         Filter.super.init(filterConfig);
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String url = httpRequest.getRequestURI();
 
-        // 조만간 수정 해야 함
         if (url.startsWith("/api/v1/auth")) {
             chain.doFilter(request, response);
             return;
