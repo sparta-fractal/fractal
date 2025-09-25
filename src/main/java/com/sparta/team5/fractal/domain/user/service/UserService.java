@@ -47,12 +47,12 @@ public class UserService implements UserServiceApi {
 		User user = userRepository.findById(
 			authUser.id()).orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 
-		if (passwordEncoder.matches(request.newPassword(), user.getPassword())) {
-			throw new GlobalException(UserErrorCode.PASSWORD_SAME_AS_OLD);
-		}
-
 		if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
 			throw new GlobalException(UserErrorCode.INVALID_OLD_PASSWORD);
+		}
+
+		if (passwordEncoder.matches(request.newPassword(), user.getPassword())) {
+			throw new GlobalException(UserErrorCode.PASSWORD_SAME_AS_OLD);
 		}
 
 		user.changePassword(passwordEncoder.encode(request.newPassword()));
