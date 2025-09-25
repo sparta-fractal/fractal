@@ -2,7 +2,9 @@ package com.sparta.team5.fractal.domain.auth.service;
 
 import com.sparta.team5.fractal.common.config.JwtUtil;
 import com.sparta.team5.fractal.common.config.PasswordEncoder;
+import com.sparta.team5.fractal.domain.auth.dto.request.AuthLoginRequest;
 import com.sparta.team5.fractal.domain.auth.dto.request.AuthRegisterRequest;
+import com.sparta.team5.fractal.domain.auth.dto.respone.AuthResponse;
 import com.sparta.team5.fractal.domain.user.entity.User;
 import com.sparta.team5.fractal.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,5 +36,20 @@ public class AuthService implements AuthServiceApi {
         );
 
         userRepository.save(user);
+    }
+
+    @Override
+    public AuthResponse login(AuthLoginRequest authLoginRequest) {
+        User user = userRepository.findByEmail(authLoginRequest.email()).orElseThrow(
+                () -> new IllegalArgumentException("가입되지 않은 유저입니다."));
+
+        // 로그인 시 이메일과 비밀번호가 일치하지 않을 경우 401을 반환합니다.
+        if (!passwordEncoder.matches(authLoginRequest.password(), user.getPassword())) {
+            throw new IllegalArgumentException("잘못된 비밀번호입니다.");
+        }
+
+        String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname());
+
+        return new AuthResponse(bearerToken);
     }
 }
