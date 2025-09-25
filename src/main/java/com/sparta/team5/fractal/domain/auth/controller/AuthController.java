@@ -3,6 +3,7 @@ package com.sparta.team5.fractal.domain.auth.controller;
 import com.sparta.team5.fractal.common.response.ApiResponse;
 import com.sparta.team5.fractal.domain.auth.dto.request.AuthRegisterRequest;
 import com.sparta.team5.fractal.domain.auth.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,11 +20,11 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<Void>> register(
-            @RequestBody AuthRegisterRequest authRegisterRequest
+            @Valid @RequestBody AuthRegisterRequest authRegisterRequest
     ) {
 
         authService.register(authRegisterRequest);
 
-        return ApiResponse.success(null, "성공");
+        return ApiResponse.success(null, "회원가입 성공");
     }
 }
