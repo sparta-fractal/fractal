@@ -2,9 +2,11 @@ package com.sparta.team5.fractal.domain.auth.service;
 
 import com.sparta.team5.fractal.common.config.JwtUtil;
 import com.sparta.team5.fractal.common.config.PasswordEncoder;
+import com.sparta.team5.fractal.common.dto.AuthUser;
 import com.sparta.team5.fractal.domain.auth.dto.request.AuthLoginRequest;
 import com.sparta.team5.fractal.domain.auth.dto.request.AuthRegisterRequest;
-import com.sparta.team5.fractal.domain.auth.dto.respone.AuthResponse;
+import com.sparta.team5.fractal.domain.auth.dto.request.AuthWithdrawRequest;
+import com.sparta.team5.fractal.domain.auth.dto.response.AuthResponse;
 import com.sparta.team5.fractal.domain.user.entity.User;
 import com.sparta.team5.fractal.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +42,7 @@ public class AuthService implements AuthServiceApi {
 
     @Override
     public AuthResponse login(AuthLoginRequest authLoginRequest) {
+
         User user = userRepository.findByEmail(authLoginRequest.email()).orElse(null);
 
         // 로그인 시 이메일과 비밀번호가 일치하지 않을 경우 401을 반환합니다.
@@ -50,5 +53,22 @@ public class AuthService implements AuthServiceApi {
         String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname());
 
         return new AuthResponse(bearerToken);
+    }
+
+    @Override
+    public void withdraw(AuthUser authUser, AuthWithdrawRequest authWithdrawRequest) {
+
+        System.out.println(authUser.email());
+        System.out.println(authUser.nickname());
+
+        User user = userRepository.findByEmail(authUser.email()).orElseThrow(
+                () -> new IllegalArgumentException("이메일이 존재하지 않습니다.")
+        );
+
+        if (!passwordEncoder.matches(authWithdrawRequest.password(), user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        user.delete();
     }
 }
