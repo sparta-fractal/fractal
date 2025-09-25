@@ -35,6 +35,7 @@ public class JwtFilter implements Filter {
 
         if (url.startsWith("/api/v1/auth")) {
             chain.doFilter(request, response);
+            log.info("JwtFilter init");
             return;
         }
 
