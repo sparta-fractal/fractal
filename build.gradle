@@ -2,7 +2,28 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.6'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
 }
+
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.30
+            }
+        }
+    }
+}
+
+check.dependsOn jacocoTestCoverageVerification
 
 group = 'com.sparta.team5'
 version = '0.0.1-SNAPSHOT'
@@ -32,6 +53,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // 테스트에서만 사용
+    testImplementation 'com.h2database:h2'
 }
 
 tasks.named('test') {
