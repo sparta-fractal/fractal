@@ -31,9 +31,9 @@ public class JwtFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String url = httpRequest.getRequestURI();
+        String url = "/api/v1/auth";
 
-        if (url.startsWith("/api/v1/auth")) {
+        if (httpRequest.getRequestURI().matches(url + "/login") || httpRequest.getRequestURI().matches(url + "/signup")) {
             chain.doFilter(request, response);
             log.info("JwtFilter init");
             return;
