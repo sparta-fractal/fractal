@@ -27,11 +27,13 @@ public class UserService implements UserServiceApi {
 		User user = userRepository.findById(
 			authUser.id()).orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 
+		if (!user.getEmail().equals(request.email()) && userRepository.existsByEmail(request.email())) {
+			throw new GlobalException(UserErrorCode.DUPLICATE_EMAIL);
+		}
+
 		user.changeProfile(request.email(), request.nickname());
 
-		User savedUser = userRepository.save(user);
-
-		return UpdateUserProfileResponse.from(savedUser);
+		return UpdateUserProfileResponse.from(user);
 	}
 
 	@Override
