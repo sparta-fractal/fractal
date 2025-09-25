@@ -8,7 +8,7 @@ import com.sparta.team5.fractal.domain.auth.dto.request.AuthRegisterRequest;
 import com.sparta.team5.fractal.domain.auth.dto.request.AuthWithdrawRequest;
 import com.sparta.team5.fractal.domain.auth.dto.response.AuthResponse;
 import com.sparta.team5.fractal.domain.user.entity.User;
-import com.sparta.team5.fractal.domain.user.repository.UserRepository;
+import com.sparta.team5.fractal.domain.user.service.UserServiceApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,32 +18,30 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService implements AuthServiceApi {
 
-    private final UserRepository userRepository;
+    private final UserServiceApi userServiceApi;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
     @Override
     public void register(AuthRegisterRequest authRegisterRequest) {
 
-        if (userRepository.existsByEmail(authRegisterRequest.email())) {
+        if (userServiceApi.existsByEmail(authRegisterRequest.email())) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
 
         String encodedPassword = passwordEncoder.encode(authRegisterRequest.password());
 
-        User user = new User(
+        userServiceApi.createUser(
                 authRegisterRequest.email(),
                 encodedPassword,
                 authRegisterRequest.nickname()
         );
-
-        userRepository.save(user);
     }
 
     @Override
     public AuthResponse login(AuthLoginRequest authLoginRequest) {
 
-        User user = userRepository.findByEmail(authLoginRequest.email()).orElse(null);
+        User user = userServiceApi.findByEmail(authLoginRequest.email()).orElse(null);
 
         // 로그인 시 이메일과 비밀번호가 일치하지 않을 경우 401을 반환합니다.
         if (user == null || !passwordEncoder.matches(authLoginRequest.password(), user.getPassword())) {
@@ -61,7 +59,7 @@ public class AuthService implements AuthServiceApi {
         System.out.println(authUser.email());
         System.out.println(authUser.nickname());
 
-        User user = userRepository.findByEmail(authUser.email()).orElseThrow(
+        User user = userServiceApi.findByEmail(authUser.email()).orElseThrow(
                 () -> new IllegalArgumentException("이메일이 존재하지 않습니다.")
         );
 
