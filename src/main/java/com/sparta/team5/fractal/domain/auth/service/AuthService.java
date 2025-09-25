@@ -50,14 +50,11 @@ public class AuthService implements AuthServiceApi {
 
         String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname());
 
-        return new AuthResponse(bearerToken);
+        return AuthResponse.from(bearerToken);
     }
 
     @Override
     public void withdraw(AuthUser authUser, AuthWithdrawRequest authWithdrawRequest) {
-
-        System.out.println(authUser.email());
-        System.out.println(authUser.nickname());
 
         User user = userServiceApi.findByEmail(authUser.email()).orElseThrow(
                 () -> new IllegalArgumentException("이메일이 존재하지 않습니다.")
