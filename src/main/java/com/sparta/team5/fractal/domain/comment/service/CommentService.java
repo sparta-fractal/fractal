@@ -43,6 +43,9 @@ public class CommentService implements CommentServiceApi {
     @Transactional(readOnly = true)
     public Page<CommentResponse> getComments(Long productId, Pageable pageable) {
 
+        productService.findById(productId)
+                .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
+        
         Page<Comment> commentPage = commentRepository.findAllByProductId(productId, pageable);
 
         return commentPage.map(CommentResponse::from);
