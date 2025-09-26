@@ -1,4 +1,4 @@
-# Copilot Instruction Guide
+# Gemini Instruction Guide
 
 ## Naming Conventions
 
