@@ -9,6 +9,9 @@ import com.sparta.team5.fractal.domain.product.exception.ProductErrorCode;
 import com.sparta.team5.fractal.domain.product.repository.ProductRepository;
 import com.sparta.team5.fractal.domain.tag.entity.Tag;
 import com.sparta.team5.fractal.domain.tag.repository.TagRepository;
+import com.sparta.team5.fractal.domain.category.entity.Category;
+import com.sparta.team5.fractal.domain.category.repository.CategoryRepository;
+import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
 import com.sparta.team5.fractal.common.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,13 +33,18 @@ public class ProductService implements ProductServiceApi {
 
     private final ProductRepository productRepository;
     private final TagRepository tagRepository;
+    private final CategoryRepository categoryRepository;
 
     public ProductResponse createProduct(ProductCreateRequest request) {
+        Set<Category> categories = processCategories(request.categoryIds());
+
         Product product = Product.of(
             request.title(),
             request.price(),
             request.description()
         );
+
+        product.replaceCategories(categories);
 
         Set<Tag> tags = processTags(request.tags());
         product.replaceTags(tags);
@@ -84,16 +92,33 @@ public class ProductService implements ProductServiceApi {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
+        Set<Category> categories = processCategories(request.categoryIds());
+
         product.update(
             request.title(),
             request.price(),
             request.description()
         );
 
+        product.replaceCategories(categories);
+
         Set<Tag> tags = processTags(request.tags());
         product.replaceTags(tags);
 
-        return ProductResponse.from(product);
+        Product updatedProduct = productRepository.save(product);
+
+        return ProductResponse.from(updatedProduct);
+    }
+
+    private Set<Category> processCategories(List<Long> categoryIds) {
+        if (categoryIds == null || categoryIds.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        return categoryIds.stream()
+                .map(categoryId -> categoryRepository.findById(categoryId)
+                        .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND)))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private Set<Tag> processTags(List<String> tagNames) {
