@@ -2,6 +2,7 @@ package com.sparta.team5.fractal.domain.product.entity;
 
 import com.sparta.team5.fractal.common.entity.BaseEntity;
 import com.sparta.team5.fractal.domain.tag.entity.Tag;
+import com.sparta.team5.fractal.domain.category.entity.Category;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +18,6 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -39,6 +39,9 @@ public class Product extends BaseEntity {
 
     @Column(nullable = false, length = 1000)
     private String description;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ProductCategory> productCategories = new HashSet<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductTag> productTags = new HashSet<>();
@@ -71,10 +74,10 @@ public class Product extends BaseEntity {
 
     public void addTag(Tag tag) {
         if (tag == null) {
-            return;
+            throw new IllegalArgumentException("태그는 null일 수 없습니다");
         }
         boolean exists = this.productTags.stream()
-                .anyMatch(pt -> Objects.equals(pt.getTag().getId(), tag.getId()));
+                .anyMatch(pt -> pt.getTag().equals(tag));
         if (!exists) {
             this.productTags.add(ProductTag.of(this, tag));
         }
@@ -84,6 +87,34 @@ public class Product extends BaseEntity {
         if (tag == null) {
             return;
         }
-        this.productTags.removeIf(pt -> Objects.equals(pt.getTag().getId(), tag.getId()));
+        this.productTags.removeIf(pt -> pt.getTag().equals(tag));
+    }
+
+    public void replaceCategories(Set<Category> categories) {
+        this.productCategories.clear();
+        if (categories == null) {
+            return;
+        }
+        for (Category category : categories) {
+            this.productCategories.add(ProductCategory.of(this, category));
+        }
+    }
+
+    public void addCategory(Category category) {
+        if (category == null) {
+            throw new IllegalArgumentException("카테고리는 null일 수 없습니다");
+        }
+        boolean exists = this.productCategories.stream()
+                .anyMatch(pc -> pc.getCategory().equals(category));
+        if (!exists) {
+            this.productCategories.add(ProductCategory.of(this, category));
+        }
+    }
+
+    public void removeCategory(Category category) {
+        if (category == null) {
+            return;
+        }
+        this.productCategories.removeIf(pc -> pc.getCategory().equals(category));
     }
 }
