@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Table(name = "searches")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Search {
 
     @Id
@@ -23,6 +26,15 @@ public class Search {
     @Column(nullable = false)
     private Long count = 0L;
 
-    @Column(nullable = false)
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    private Search(String name) {
+        this.name = name;
+    }
+
+    public static Search of(String name) {
+        return new Search(name);
+    }
 }
