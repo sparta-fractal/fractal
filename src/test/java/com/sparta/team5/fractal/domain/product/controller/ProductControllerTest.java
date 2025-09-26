@@ -87,7 +87,7 @@ class ProductControllerTest {
         mockMvc.perform(get("/api/v1/products/{productId}", productId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("상품을 성공적으로 조회했습니다."));
+                .andExpect(jsonPath("$.message").value("상품 조회에 성공했습니다."));
 
         verify(productService).getProduct(productId);
     }
@@ -105,7 +105,7 @@ class ProductControllerTest {
                 .param("sort", "createdAt,desc"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("상품 목록을 성공적으로 조회했습니다."));
+                .andExpect(jsonPath("$.message").value("상품 목록 조회에 성공했습니다."));
 
         verify(productService).getProducts(any(Pageable.class));
     }

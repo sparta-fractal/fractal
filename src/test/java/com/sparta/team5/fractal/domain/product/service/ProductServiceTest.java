@@ -100,7 +100,7 @@ class ProductServiceTest {
         // when & then
         assertThatThrownBy(() -> productService.createProduct(request))
                 .isInstanceOf(GlobalException.class)
-                .hasMessage("카테고리를 찾을 수 없습니다.");
+                .hasMessage("[CATEGORY_001] 404 NOT_FOUND - 카테고리를 찾을 수 없습니다.");
 
         verify(categoryRepository).findById(999L);
         verify(productRepository, never()).save(any(Product.class));
@@ -137,7 +137,7 @@ class ProductServiceTest {
         // when & then
         assertThatThrownBy(() -> productService.getProduct(productId))
                 .isInstanceOf(GlobalException.class)
-                .hasMessage("상품을 찾을 수 없습니다.");
+                .hasMessage("[PRODUCT_NOT_FOUND] 404 NOT_FOUND - 상품을 찾을 수 없습니다.");
 
         verify(productRepository).findById(productId);
     }
@@ -219,7 +219,7 @@ class ProductServiceTest {
         // when & then
         assertThatThrownBy(() -> productService.updateProduct(productId, request))
                 .isInstanceOf(GlobalException.class)
-                .hasMessage("상품을 찾을 수 없습니다.");
+                .hasMessage("[PRODUCT_NOT_FOUND] 404 NOT_FOUND - 상품을 찾을 수 없습니다.");
 
         verify(productRepository).findById(productId);
         verify(productRepository, never()).save(any(Product.class));
@@ -254,7 +254,7 @@ class ProductServiceTest {
         // when & then
         assertThatThrownBy(() -> productService.deleteProduct(productId))
                 .isInstanceOf(GlobalException.class)
-                .hasMessage("상품을 찾을 수 없습니다.");
+                .hasMessage("[PRODUCT_NOT_FOUND] 404 NOT_FOUND - 상품을 찾을 수 없습니다.");
 
         verify(productRepository).findById(productId);
         verify(productRepository, never()).save(any(Product.class));
