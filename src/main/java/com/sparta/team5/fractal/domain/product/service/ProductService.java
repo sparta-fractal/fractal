@@ -91,6 +91,7 @@ public class ProductService implements ProductServiceApi {
             .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
         product.delete();
+        
         productRepository.save(product);
     }
 }

@@ -85,6 +85,6 @@ public class ProductController {
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long productId) {
         productService.deleteProduct(productId);
-        return ApiResponse.noContent("상품이 성공적으로 삭제되었습니다.");
+        return ApiResponse.success(null, "상품이 성공적으로 삭제되었습니다.");
     }
 }
