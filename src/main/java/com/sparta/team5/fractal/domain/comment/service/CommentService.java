@@ -12,6 +12,8 @@ import com.sparta.team5.fractal.domain.user.entity.User;
 import com.sparta.team5.fractal.domain.user.exception.UserErrorCode;
 import com.sparta.team5.fractal.domain.user.service.UserServiceApi;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,5 +40,14 @@ public class CommentService implements CommentServiceApi {
         return CommentResponse.from(comment);
     }
 
+    @Transactional(readOnly = true)
+    public Page<CommentResponse> getComments(Long productId, Pageable pageable) {
 
+        productService.findById(productId)
+                .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
+        
+        Page<Comment> commentPage = commentRepository.findAllByProductId(productId, pageable);
+
+        return commentPage.map(CommentResponse::from);
+    }
 }
