@@ -19,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.List;
+import java.util.LinkedHashSet;
 
 @Service
 @RequiredArgsConstructor
@@ -35,12 +38,7 @@ public class ProductService implements ProductServiceApi {
             request.description()
         );
 
-        Set<Tag> tags = request.tags().stream()
-            .map(String::trim)
-            .filter(s -> !s.isEmpty())
-            .map(name -> tagRepository.findByName(name).orElseGet(() -> tagRepository.save(Tag.of(name))))
-            .collect(Collectors.toSet());
-
+        Set<Tag> tags = processTags(request.tags());
         product.replaceTags(tags);
 
         Product savedProduct = productRepository.save(product);
@@ -92,14 +90,23 @@ public class ProductService implements ProductServiceApi {
             request.description()
         );
 
-        Set<Tag> tags = request.tags().stream()
-            .map(String::trim)
-            .filter(s -> !s.isEmpty())
-            .map(name -> tagRepository.findByName(name).orElseGet(() -> tagRepository.save(Tag.of(name))))
-            .collect(Collectors.toSet());
+        Set<Tag> tags = processTags(request.tags());
         product.replaceTags(tags);
 
         return ProductResponse.from(product);
+    }
+
+    private Set<Tag> processTags(List<String> tagNames) {
+        if (tagNames == null || tagNames.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        return tagNames.stream()
+                .map(name -> name == null ? "" : name.trim())
+                .filter(s -> !s.isEmpty())
+                .map(name -> tagRepository.findByName(name)
+                        .orElseGet(() -> tagRepository.save(Tag.of(name))))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public void deleteProduct(Long productId) {

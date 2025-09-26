@@ -70,7 +70,9 @@ public class Product extends BaseEntity {
     }
 
     public void addTag(Tag tag) {
-        if (tag == null) return;
+        if (tag == null) {
+            return;
+        }
         boolean exists = this.productTags.stream()
                 .anyMatch(pt -> Objects.equals(pt.getTag().getId(), tag.getId()));
         if (!exists) {
@@ -79,7 +81,9 @@ public class Product extends BaseEntity {
     }
 
     public void removeTag(Tag tag) {
-        if (tag == null) return;
+        if (tag == null) {
+            return;
+        }
         this.productTags.removeIf(pt -> Objects.equals(pt.getTag().getId(), tag.getId()));
     }
-};
+}
