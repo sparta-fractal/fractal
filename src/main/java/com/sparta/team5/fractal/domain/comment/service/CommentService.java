@@ -23,9 +23,9 @@ public class CommentService implements CommentServiceApi {
     private final ProductServiceApi productService;
 
     @Transactional
-    public CommentResponse createComment(Long productId, CommentRequest request, Long id) {
+    public CommentResponse createComment(Long productId, CommentRequest request, Long userid) {
 
-        User user = userService.findById(id)
+        User user = userService.findById(userid)
                 .orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 
         Product product = productService.findById(productId)
@@ -33,7 +33,7 @@ public class CommentService implements CommentServiceApi {
 
         Comment comment = Comment.create(request.content(), user, product);
 
-        comment = commentRepository.save(comment);
+        commentRepository.save(comment);
 
         return CommentResponse.from(comment);
     }
