@@ -47,4 +47,11 @@ public class Product extends BaseEntity {
     public static Product of(String title, BigDecimal price, String description, String tags) {
         return new Product(title, price, description, tags);
     }
+
+    public void update(String title, BigDecimal price, String description, String tags) {
+        this.title = title;
+        this.price = price;
+        this.description = description;
+        this.tags = tags;
+    }
 }

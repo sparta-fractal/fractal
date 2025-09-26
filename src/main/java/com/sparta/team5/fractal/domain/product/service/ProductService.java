@@ -3,6 +3,7 @@ package com.sparta.team5.fractal.domain.product.service;
 import com.sparta.team5.fractal.domain.product.dto.ProductCreateRequest;
 import com.sparta.team5.fractal.domain.product.dto.ProductListResponse;
 import com.sparta.team5.fractal.domain.product.dto.ProductResponse;
+import com.sparta.team5.fractal.domain.product.dto.ProductUpdateRequest;
 import com.sparta.team5.fractal.domain.product.entity.Product;
 import com.sparta.team5.fractal.domain.product.exception.ProductErrorCode;
 import com.sparta.team5.fractal.domain.product.repository.ProductRepository;
@@ -67,5 +68,30 @@ public class ProductService implements ProductServiceApi {
         Page<Product> productPage = productRepository.findAll(pageable);
         
         return ProductListResponse.from(productPage);
+    }
+
+    public ProductResponse updateProduct(Long productId, ProductUpdateRequest request) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        product.update(
+            request.title(),
+            request.price(),
+            request.description(),
+            request.tags()
+        );
+
+        Product updatedProduct = productRepository.save(product);
+
+        return ProductResponse.from(updatedProduct);
+    }
+
+    public void deleteProduct(Long productId) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        product.delete();
+        
+        productRepository.save(product);
     }
 }
