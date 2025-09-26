@@ -4,6 +4,7 @@ import com.sparta.team5.fractal.common.response.ApiResponse;
 import com.sparta.team5.fractal.domain.product.dto.ProductCreateRequest;
 import com.sparta.team5.fractal.domain.product.dto.ProductListResponse;
 import com.sparta.team5.fractal.domain.product.dto.ProductResponse;
+import com.sparta.team5.fractal.domain.product.dto.ProductUpdateRequest;
 import com.sparta.team5.fractal.domain.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -59,5 +60,20 @@ public class ProductController {
         ProductListResponse productListResponse = productService.getProducts(pageable);
 
         return ApiResponse.success(productListResponse, "상품 목록 조회에 성공했습니다.");
+    }
+
+    /**
+     * 상품 수정 엔드포인트
+     * 
+     * @param productId 수정할 상품 ID
+     * @param request 상품 수정 요청 정보
+     * @return 수정된 상품 정보
+     */
+    @PutMapping("/{productId}")
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(@PathVariable Long productId, 
+                                                                     @Valid @RequestBody ProductUpdateRequest request) {
+        ProductResponse productResponse = productService.updateProduct(productId, request);
+
+        return ApiResponse.success(productResponse, "상품이 성공적으로 수정되었습니다.");
     }
 }
