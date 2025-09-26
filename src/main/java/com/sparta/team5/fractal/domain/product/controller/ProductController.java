@@ -2,10 +2,14 @@ package com.sparta.team5.fractal.domain.product.controller;
 
 import com.sparta.team5.fractal.common.response.ApiResponse;
 import com.sparta.team5.fractal.domain.product.dto.ProductCreateRequest;
+import com.sparta.team5.fractal.domain.product.dto.ProductListResponse;
 import com.sparta.team5.fractal.domain.product.dto.ProductResponse;
 import com.sparta.team5.fractal.domain.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,5 +44,20 @@ public class ProductController {
         ProductResponse productResponse = productService.getProduct(productId);
 
         return ApiResponse.success(productResponse, "상품 조회에 성공했습니다.");
+    }
+
+    /**
+     * 상품 목록 페이징 조회 엔드포인트
+     * 
+     * @param pageable 페이징 정보 (page, size, sort)
+     * @return 페이징된 상품 목록
+     */
+    @GetMapping
+    public ResponseEntity<ApiResponse<ProductListResponse>> getProducts(
+        @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        
+        ProductListResponse productListResponse = productService.getProducts(pageable);
+
+        return ApiResponse.success(productListResponse, "상품 목록 조회에 성공했습니다.");
     }
 }
