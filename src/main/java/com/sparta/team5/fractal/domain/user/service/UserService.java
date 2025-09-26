@@ -6,9 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.team5.fractal.common.annotation.Auth;
+import com.sparta.team5.fractal.common.config.PasswordEncoder;
 import com.sparta.team5.fractal.common.dto.AuthUser;
 import com.sparta.team5.fractal.common.exception.GlobalException;
+import com.sparta.team5.fractal.domain.user.dto.request.UpdatePasswordRequest;
 import com.sparta.team5.fractal.domain.user.dto.request.UpdateUserProfileRequest;
+import com.sparta.team5.fractal.domain.user.dto.response.UpdatePasswordResponse;
 import com.sparta.team5.fractal.domain.user.dto.response.UpdateUserProfileResponse;
 import com.sparta.team5.fractal.domain.user.entity.User;
 import com.sparta.team5.fractal.domain.user.exception.UserErrorCode;
@@ -19,7 +22,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserServiceApi {
+
 	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
 	public UpdateUserProfileResponse updateProfile(@Auth AuthUser authUser, UpdateUserProfileRequest request) {
@@ -34,6 +39,25 @@ public class UserService implements UserServiceApi {
 		user.changeProfile(request.email(), request.nickname());
 
 		return UpdateUserProfileResponse.from(user);
+	}
+
+	@Transactional
+	public UpdatePasswordResponse updatePassword(AuthUser authUser, UpdatePasswordRequest request) {
+
+		User user = userRepository.findById(
+			authUser.id()).orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
+
+		if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
+			throw new GlobalException(UserErrorCode.INVALID_OLD_PASSWORD);
+		}
+
+		if (passwordEncoder.matches(request.newPassword(), user.getPassword())) {
+			throw new GlobalException(UserErrorCode.PASSWORD_SAME_AS_OLD);
+		}
+
+		user.changePassword(passwordEncoder.encode(request.newPassword()));
+
+		return UpdatePasswordResponse.from(user);
 	}
 
 	@Override

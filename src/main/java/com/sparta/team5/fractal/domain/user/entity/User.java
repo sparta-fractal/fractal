@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class User extends BaseEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -43,5 +44,9 @@ public class User extends BaseEntity {
 	public void changeProfile(String email, String nickname) {
 		this.email = email;
 		this.nickname = nickname;
+	}
+
+	public void changePassword(String password) {
+		this.password = password;
 	}
 }
