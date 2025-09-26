@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sparta.team5.fractal.common.annotation.Auth;
 import com.sparta.team5.fractal.common.dto.AuthUser;
 import com.sparta.team5.fractal.common.response.ApiResponse;
+import com.sparta.team5.fractal.domain.user.constant.SuccessMessages;
 import com.sparta.team5.fractal.domain.user.dto.request.UpdatePasswordRequest;
 import com.sparta.team5.fractal.domain.user.dto.request.UpdateUserProfileRequest;
 import com.sparta.team5.fractal.domain.user.dto.response.UpdatePasswordResponse;
@@ -32,7 +33,7 @@ public class UserController {
 
 		UpdateUserProfileResponse response = userService.updateProfile(authUser, request);
 
-		return ApiResponse.success(response, "프로필 수정이 완료되었습니다.");
+		return ApiResponse.success(response, SuccessMessages.PROFILE_UPDATE_SUCCESS);
 	}
 
 	@PutMapping("/password")
@@ -42,7 +43,7 @@ public class UserController {
 
 		UpdatePasswordResponse response = userService.updatePassword(authUser, request);
 
-		return ApiResponse.success(response, "비밀번호 변경이 완료되었습니다.");
+		return ApiResponse.success(response, SuccessMessages.PASSWORD_UPDATE_SUCCESS);
 	}
 
 }
