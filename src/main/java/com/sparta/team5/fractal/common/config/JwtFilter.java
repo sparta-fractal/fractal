@@ -62,9 +62,12 @@ public class JwtFilter implements Filter {
             httpRequest.setAttribute("nickname", claims.get("nickname"));
 
             chain.doFilter(request, response);
-        } catch (SecurityException | MalformedJwtException e) {
+        } catch (SecurityException e) {
             log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.", e);
             throw new GlobalException(CommonErrorCode.INVALID_TOKEN);
+        } catch (MalformedJwtException e) {
+            log.error("Malformed JWT Token, 잘못된 JWT 토큰 입니다.", e);
+            throw new GlobalException(CommonErrorCode.MALFORMED_TOKEN);
         } catch (ExpiredJwtException e) {
             log.error("Expired JWT token, 만료된 JWT token 입니다.", e);
             throw new GlobalException(CommonErrorCode.EXPIRED_TOKEN);
