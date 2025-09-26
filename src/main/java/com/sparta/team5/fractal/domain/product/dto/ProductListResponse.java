@@ -23,7 +23,7 @@ public record ProductListResponse(
 
         return new ProductListResponse(
             productSummaries,
-            productPage.getNumber(),
+            productPage.getNumber() + 1,  // 0-based를 1-based로 변환
             productPage.getTotalPages(),
             productPage.getTotalElements(),
             productPage.hasNext(),

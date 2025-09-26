@@ -37,7 +37,7 @@ public class ProductService implements ProductServiceApi {
 
     @Transactional(readOnly = true)
     public ProductResponse getProduct(Long productId) {
-        Product product = findById(productId)
+        Product product = productRepository.findById(productId)
             .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
         return ProductResponse.from(product);
@@ -64,7 +64,8 @@ public class ProductService implements ProductServiceApi {
 
     @Transactional(readOnly = true)
     public ProductListResponse getProducts(Pageable pageable) {
-        Page<Product> productPage = findAll(pageable);
+        Page<Product> productPage = productRepository.findAll(pageable);
+        
         return ProductListResponse.from(productPage);
     }
 }
