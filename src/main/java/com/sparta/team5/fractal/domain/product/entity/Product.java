@@ -1,11 +1,14 @@
 package com.sparta.team5.fractal.domain.product.entity;
 
 import com.sparta.team5.fractal.common.entity.BaseEntity;
+import com.sparta.team5.fractal.domain.tag.entity.Tag;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,6 +16,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "products")
@@ -34,24 +40,46 @@ public class Product extends BaseEntity {
     @Column(nullable = false, length = 1000)
     private String description;
 
-    @Column(nullable = false, length = 200)
-    private String tags;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ProductTag> productTags = new HashSet<>();
 
-    private Product(String title, BigDecimal price, String description, String tags) {
+    private Product(String title, BigDecimal price, String description) {
         this.title = title;
         this.price = price;
         this.description = description;
-        this.tags = tags;
     }
 
-    public static Product of(String title, BigDecimal price, String description, String tags) {
-        return new Product(title, price, description, tags);
+    public static Product of(String title, BigDecimal price, String description) {
+        return new Product(title, price, description);
     }
 
-    public void update(String title, BigDecimal price, String description, String tags) {
+    public void update(String title, BigDecimal price, String description) {
         this.title = title;
         this.price = price;
         this.description = description;
-        this.tags = tags;
     }
-}
+
+    public void replaceTags(Set<Tag> tags) {
+        this.productTags.clear();
+        if (tags == null) {
+            return;
+        }
+        for (Tag tag : tags) {
+            this.productTags.add(ProductTag.of(this, tag));
+        }
+    }
+
+    public void addTag(Tag tag) {
+        if (tag == null) return;
+        boolean exists = this.productTags.stream()
+                .anyMatch(pt -> Objects.equals(pt.getTag().getId(), tag.getId()));
+        if (!exists) {
+            this.productTags.add(ProductTag.of(this, tag));
+        }
+    }
+
+    public void removeTag(Tag tag) {
+        if (tag == null) return;
+        this.productTags.removeIf(pt -> Objects.equals(pt.getTag().getId(), tag.getId()));
+    }
+};
