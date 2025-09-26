@@ -1,6 +1,8 @@
 package com.sparta.team5.fractal.domain.product.service;
 
 import com.sparta.team5.fractal.domain.product.entity.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -23,4 +25,13 @@ public interface ProductServiceApi {
      * @return 상품 존재 여부
      */
     boolean existsById(Long productId);
+
+    /**
+     * 페이징된 상품 목록을 조회합니다.
+     * 삭제되지 않은 상품만 조회됩니다.
+     * 
+     * @param pageable 페이징 정보 (페이지 번호, 크기, 정렬)
+     * @return 페이징된 상품 목록
+     */
+    Page<Product> findAll(Pageable pageable);
 }
