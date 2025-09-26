@@ -7,6 +7,8 @@ import com.sparta.team5.fractal.domain.product.dto.ProductUpdateRequest;
 import com.sparta.team5.fractal.domain.product.entity.Product;
 import com.sparta.team5.fractal.domain.product.exception.ProductErrorCode;
 import com.sparta.team5.fractal.domain.product.repository.ProductRepository;
+import com.sparta.team5.fractal.domain.tag.entity.Tag;
+import com.sparta.team5.fractal.domain.tag.repository.TagRepository;
 import com.sparta.team5.fractal.common.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,14 +26,22 @@ import java.util.Optional;
 public class ProductService implements ProductServiceApi {
 
     private final ProductRepository productRepository;
+    private final TagRepository tagRepository;
 
     public ProductResponse createProduct(ProductCreateRequest request) {
         Product product = Product.of(
             request.title(),
             request.price(),
-            request.description(),
-            request.tags()
+            request.description()
         );
+
+        Set<Tag> tags = request.tags().stream()
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .map(name -> tagRepository.findByName(name).orElseGet(() -> tagRepository.save(Tag.of(name))))
+            .collect(Collectors.toSet());
+
+        product.replaceTags(tags);
 
         Product savedProduct = productRepository.save(product);
 
@@ -77,13 +89,17 @@ public class ProductService implements ProductServiceApi {
         product.update(
             request.title(),
             request.price(),
-            request.description(),
-            request.tags()
+            request.description()
         );
 
-        Product updatedProduct = productRepository.save(product);
+        Set<Tag> tags = request.tags().stream()
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .map(name -> tagRepository.findByName(name).orElseGet(() -> tagRepository.save(Tag.of(name))))
+            .collect(Collectors.toSet());
+        product.replaceTags(tags);
 
-        return ProductResponse.from(updatedProduct);
+        return ProductResponse.from(product);
     }
 
     public void deleteProduct(Long productId) {
