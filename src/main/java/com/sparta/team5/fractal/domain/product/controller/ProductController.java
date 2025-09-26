@@ -76,4 +76,15 @@ public class ProductController {
 
         return ApiResponse.success(productResponse, "상품이 성공적으로 수정되었습니다.");
     }
+
+    /**
+     * 상품 삭제 엔드포인트 (Soft Delete)
+     *
+     * @param productId 삭제할 상품 ID
+     */
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long productId) {
+        productService.deleteProduct(productId);
+        return ApiResponse.success(null, "상품이 성공적으로 삭제되었습니다.");
+    }
 }

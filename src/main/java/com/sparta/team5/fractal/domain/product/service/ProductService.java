@@ -85,4 +85,13 @@ public class ProductService implements ProductServiceApi {
 
         return ProductResponse.from(updatedProduct);
     }
+
+    public void deleteProduct(Long productId) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
+
+        product.delete();
+        
+        productRepository.save(product);
+    }
 }
