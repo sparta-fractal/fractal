@@ -2,12 +2,13 @@ package com.sparta.team5.fractal.domain.product.dto;
 
 import com.sparta.team5.fractal.domain.product.entity.Product;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record ProductResponse(
     Long id,
     String title,
-    String price,
+    BigDecimal price,
     String description,
     String tags,
     LocalDateTime createdAt,

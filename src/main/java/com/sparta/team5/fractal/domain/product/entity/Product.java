@@ -11,6 +11,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "products")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,8 +26,8 @@ public class Product extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String title;
 
-    @Column(nullable = false, length = 50)
-    private String price;
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal price;
 
     @Column(nullable = false, length = 1000)
     private String description;
@@ -33,14 +35,14 @@ public class Product extends BaseEntity {
     @Column(nullable = false, length = 200)
     private String tags;
 
-    private Product(String title, String price, String description, String tags) {
+    private Product(String title, BigDecimal price, String description, String tags) {
         this.title = title;
         this.price = price;
         this.description = description;
         this.tags = tags;
     }
 
-    public static Product of(String title, String price, String description, String tags) {
+    public static Product of(String title, BigDecimal price, String description, String tags) {
         return new Product(title, price, description, tags);
     }
 }
