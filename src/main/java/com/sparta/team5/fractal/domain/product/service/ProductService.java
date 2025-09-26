@@ -105,7 +105,7 @@ public class ProductService implements ProductServiceApi {
                 .map(name -> name == null ? "" : name.trim())
                 .filter(s -> !s.isEmpty())
                 .map(name -> tagRepository.findByName(name)
-                        .orElseGet(() -> tagRepository.save(Tag.of(name))))
+                        .orElseGet(() -> tagRepository.save(Tag.from(name))))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
