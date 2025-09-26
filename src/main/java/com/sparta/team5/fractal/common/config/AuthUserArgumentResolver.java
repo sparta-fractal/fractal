@@ -2,6 +2,8 @@ package com.sparta.team5.fractal.common.config;
 
 import com.sparta.team5.fractal.common.annotation.Auth;
 import com.sparta.team5.fractal.common.dto.AuthUser;
+import com.sparta.team5.fractal.common.exception.CommonErrorCode;
+import com.sparta.team5.fractal.common.exception.GlobalException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
@@ -19,7 +21,7 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 
         // @Auth 어노테이션과 AuthUser 타입이 함께 사용되지 않은 경우 예외 발생
         if (hasAuthAnnotation != isAuthUserType) {
-            throw new IllegalArgumentException("@Auth와 AuthUser 타입은 함께 사용되어야 합니다.");
+            throw new GlobalException(CommonErrorCode.AUTH_ANNOTATION_MISMATCH);
         }
 
         return hasAuthAnnotation;

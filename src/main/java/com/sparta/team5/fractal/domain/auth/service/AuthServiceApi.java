@@ -7,8 +7,7 @@ import com.sparta.team5.fractal.domain.auth.dto.request.AuthWithdrawRequest;
 import com.sparta.team5.fractal.domain.auth.dto.response.AuthResponse;
 
 public interface AuthServiceApi {
-
-
+    
     void register(AuthRegisterRequest authRegisterRequest);
 
     AuthResponse login(AuthLoginRequest authLoginRequest);

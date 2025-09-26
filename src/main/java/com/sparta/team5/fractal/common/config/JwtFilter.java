@@ -1,5 +1,7 @@
 package com.sparta.team5.fractal.common.config;
 
+import com.sparta.team5.fractal.common.exception.CommonErrorCode;
+import com.sparta.team5.fractal.common.exception.GlobalException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -43,8 +45,7 @@ public class JwtFilter implements Filter {
 
         if (bearerJwt == null) {
             // 토큰이 없는 경우 401을 반환합니다.
-            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT 토큰이 필요합니다.");
-            return;
+            throw new GlobalException(CommonErrorCode.MISSING_TOKEN);
         }
 
         String jwt = jwtUtil.substringToken(bearerJwt);
@@ -53,8 +54,7 @@ public class JwtFilter implements Filter {
             // JWT 유효성 검사와 claims 추출
             Claims claims = jwtUtil.extractClaims(jwt);
             if (claims == null) {
-                httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 JWT 토큰입니다.");
-                return;
+                throw new GlobalException(CommonErrorCode.MALFORMED_TOKEN);
             }
 
             httpRequest.setAttribute("userId", Long.parseLong(claims.getSubject()));
@@ -62,18 +62,21 @@ public class JwtFilter implements Filter {
             httpRequest.setAttribute("nickname", claims.get("nickname"));
 
             chain.doFilter(request, response);
-        } catch (SecurityException | MalformedJwtException e) {
+        } catch (SecurityException e) {
             log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.", e);
-            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않는 JWT 서명입니다.");
+            throw new GlobalException(CommonErrorCode.INVALID_TOKEN);
+        } catch (MalformedJwtException e) {
+            log.error("Malformed JWT Token, 잘못된 JWT 토큰 입니다.", e);
+            throw new GlobalException(CommonErrorCode.MALFORMED_TOKEN);
         } catch (ExpiredJwtException e) {
             log.error("Expired JWT token, 만료된 JWT token 입니다.", e);
-            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "만료된 JWT 토큰입니다.");
+            throw new GlobalException(CommonErrorCode.EXPIRED_TOKEN);
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.", e);
-            httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "지원되지 않는 JWT 토큰입니다.");
+            throw new GlobalException(CommonErrorCode.UNSUPPORTED_TOKEN);
         } catch (Exception e) {
             log.error("Internal server error", e);
-            httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            throw new GlobalException(CommonErrorCode.SERVER_ERROR);
         }
     }
 
