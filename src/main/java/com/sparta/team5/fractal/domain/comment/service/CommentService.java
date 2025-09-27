@@ -33,7 +33,7 @@ public class CommentService implements CommentServiceApi {
         Product product = productService.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
-        Comment comment = Comment.create(request.content(), user, product);
+        Comment comment = Comment.of(request.content(), user, product);
 
         commentRepository.save(comment);
 
@@ -45,7 +45,7 @@ public class CommentService implements CommentServiceApi {
 
         productService.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
-        
+
         Page<Comment> commentPage = commentRepository.findAllByProductId(productId, pageable);
 
         return commentPage.map(CommentResponse::from);
