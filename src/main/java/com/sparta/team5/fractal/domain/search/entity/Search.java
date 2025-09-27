@@ -21,20 +21,27 @@ public class Search {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String name;
+    private String keyword;
 
     @Column(nullable = false)
-    private Long count = 0L;
+    private Long count;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    private Search(String name) {
-        this.name = name;
+    private Search(String keyword) {
+
+        this.keyword = keyword;
+        this.count = 1L;
     }
 
-    public static Search of(String name) {
-        return new Search(name);
+    public static Search of(String keyword) {
+
+        return new Search(keyword);
+    }
+
+    public void increaseCount() {
+        this.count++;
     }
 }
