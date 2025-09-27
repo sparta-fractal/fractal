@@ -9,6 +9,7 @@ public record UpdatePasswordResponse(Long id,
 									 String nickname,
 									 LocalDateTime createdAt,
 									 LocalDateTime updatedAt) {
+
 	public static UpdatePasswordResponse from(User user) {
 
 		return new UpdatePasswordResponse(
