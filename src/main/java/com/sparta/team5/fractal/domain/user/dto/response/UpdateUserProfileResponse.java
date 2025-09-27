@@ -9,6 +9,7 @@ public record UpdateUserProfileResponse(Long id,
 										String nickname,
 										LocalDateTime createdAt,
 										LocalDateTime updatedAt) {
+
 	public static UpdateUserProfileResponse from(User user) {
 
 		return new UpdateUserProfileResponse(
