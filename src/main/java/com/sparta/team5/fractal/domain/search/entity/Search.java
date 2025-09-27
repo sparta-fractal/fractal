@@ -42,6 +42,7 @@ public class Search {
     }
 
     public void increaseCount() {
+        
         this.count++;
     }
 }
