@@ -51,7 +51,7 @@ public class Comment {
     }
 
 
-    public static Comment from(String content, User user, Product product) {
+    public static Comment of(String content, User user, Product product) {
         return new Comment(content, user, product);
     }
 }
