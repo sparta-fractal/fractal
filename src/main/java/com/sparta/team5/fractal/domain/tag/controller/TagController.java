@@ -32,6 +32,6 @@ public class TagController {
 
         TagProductResponse tags = tagService.getTag(tagId);
 
-        return ApiResponse.success(tags, "태그를 조회 하였습니다.");
+        return ApiResponse.success(tags, "태그를 조회하였습니다.");
     }
 }

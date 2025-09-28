@@ -9,7 +9,7 @@ public record TagProductResponse(
         Long id,
         String name,
         Long views,
-        List<ProductSimpleResponse> product
+        List<ProductSimpleResponse> products
 ) {
     public static TagProductResponse from(Tag tag) {
         List<ProductSimpleResponse> productResponses = tag.getProductTags().stream()

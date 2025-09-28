@@ -1,8 +1,10 @@
 package com.sparta.team5.fractal.domain.tag.service;
 
+import com.sparta.team5.fractal.common.exception.GlobalException;
 import com.sparta.team5.fractal.domain.tag.dto.response.TagProductResponse;
 import com.sparta.team5.fractal.domain.tag.dto.response.TagResponse;
 import com.sparta.team5.fractal.domain.tag.entity.Tag;
+import com.sparta.team5.fractal.domain.tag.exception.TagErrorCode;
 import com.sparta.team5.fractal.domain.tag.repository.TagRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +31,7 @@ public class TagService {
     @Transactional
     public TagProductResponse getTag(Long tagId) {
         Tag tag = tagRepository.findByIdWithProducts(tagId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 태그를 찾을 수 없습니다. id: "));
+                .orElseThrow(() -> new GlobalException(TagErrorCode.TAG_NOT_FOUND));
 
         tag.increaseViewCount();
 
