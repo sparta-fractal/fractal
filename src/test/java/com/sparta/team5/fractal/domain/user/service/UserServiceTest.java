@@ -41,7 +41,7 @@ public class UserServiceTest {
 		// given
 		long userId = 1L;
 
-		AuthUser authUser = new AuthUser(userId, "rkatmxm1@a", "Rkatmxm!23");
+		AuthUser authUser = new AuthUser(userId, "rkatmxm1@a", "gamst");
 
 		User user = User.of("rkatmxm1@a", "Rkatmxm!23", "gamst");
 		ReflectionTestUtils.setField(user, "id", userId);
@@ -67,6 +67,7 @@ public class UserServiceTest {
 
 		// given
 		long userId = 1L;
+		String encodedNewPassword = "FESfhusfse34wgsdgdsgsg3";
 
 		AuthUser authUser = new AuthUser(userId, "rkatmxm1@a", "gamst");
 
@@ -77,12 +78,15 @@ public class UserServiceTest {
 
 		given(userRepository.findById(authUser.id())).willReturn(Optional.of(user));
 		given(passwordEncoder.matches(request.oldPassword(), user.getPassword())).willReturn(true);
-		given(passwordEncoder.encode(request.newPassword())).willReturn("FESfhusfse34wgsdgdsgsg3");
+		given(passwordEncoder.encode(request.newPassword())).willReturn(encodedNewPassword);
 
 		// when
 		UpdatePasswordResponse response = userService.updatePassword(authUser, request);
 
 		// then
-		assertThat(user.getPassword()).isEqualTo("FESfhusfse34wgsdgdsgsg3");
+		assertThat(user.getPassword()).isEqualTo(encodedNewPassword);
+		assertThat(response).isNotNull();
+		assertThat(response.id()).isEqualTo(userId);
+		assertThat(response.email()).isEqualTo(user.getEmail());
 	}
 }
