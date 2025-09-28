@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CategoryService {
+public class CategoryService implements CategoryServiceApi {
 
     private final CategoryRepository categoryRepository;
 
@@ -29,11 +29,7 @@ public class CategoryService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    public Optional<Category> findById(Long categoryId) {
-        return categoryRepository.findById(categoryId);
-    }
-
+    @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest request) {
         // 중복 카테고리명 체크
         if (categoryRepository.existsByName(request.name())) {
@@ -53,6 +49,7 @@ public class CategoryService {
         return CategoryResponse.from(savedCategory);
     }
 
+    @Transactional
     public CategoryResponse updateCategory(Long categoryId, CategoryCreateRequest request) {
 
         Category category = categoryRepository.findById(categoryId)
@@ -76,6 +73,7 @@ public class CategoryService {
         return CategoryResponse.from(updatedCategory);
     }
 
+    @Transactional
     public void deleteCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
@@ -83,5 +81,11 @@ public class CategoryService {
         category.delete();
 
         categoryRepository.save(category);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Category> findById(Long Id) {
+        return categoryRepository.findById(Id);
     }
 }

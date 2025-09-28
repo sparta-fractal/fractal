@@ -7,6 +7,7 @@ import com.sparta.team5.fractal.domain.tag.entity.Tag;
 import com.sparta.team5.fractal.domain.tag.exception.TagErrorCode;
 import com.sparta.team5.fractal.domain.tag.repository.TagRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class TagService {
+public class TagService implements TagServiceApi {
 
     private final TagRepository tagRepository;
 
@@ -36,5 +37,17 @@ public class TagService {
         tag.increaseViewCount();
 
         return TagProductResponse.from(tag);
+    }
+
+    @Override
+    public Optional<Tag> findByName(String name) {
+        return tagRepository.findByName(name);
+    }
+
+    @Override
+    public Tag createTag(String name) {
+        Tag newTag = Tag.from(name);
+
+        return tagRepository.save(newTag);
     }
 }
