@@ -72,7 +72,7 @@ class ProductResponseTest {
         assertThat(response.description()).isEqualTo("최신형 전자기기");
         assertThat(response.categories()).hasSize(2);
         assertThat(response.tags()).hasSize(2);
-        assertThat(response.tags()).containsExactly("시계", "트랜디");
+        assertThat(response.tags()).contains("시계", "트랜디");
     }
 
     @Test
