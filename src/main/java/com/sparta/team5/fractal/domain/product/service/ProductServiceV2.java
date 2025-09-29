@@ -17,7 +17,6 @@ import com.sparta.team5.fractal.domain.tag.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,7 +58,6 @@ public class ProductServiceV2 implements ProductServiceApi {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "product", key = "#productId")
     public ProductResponse getProduct(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
@@ -70,14 +68,12 @@ public class ProductServiceV2 implements ProductServiceApi {
     // ProductServiceApi 구현 메서드들
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "product", key = "#productId")
     public Optional<Product> findById(Long productId) {
         return productRepository.findById(productId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "product", key = "#productId")
     public boolean existsById(Long productId) {
         return productRepository.existsById(productId);
     }
@@ -103,7 +99,6 @@ public class ProductServiceV2 implements ProductServiceApi {
     }
 
     @CacheEvict(value = "products", allEntries = true)
-    @CachePut(value = "product", key = "#productId")
     public ProductResponse updateProduct(Long productId, ProductUpdateRequest request) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
@@ -150,7 +145,7 @@ public class ProductServiceV2 implements ProductServiceApi {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    @CacheEvict(value = {"product", "products"}, allEntries = true)
+    @CacheEvict(value = "products", allEntries = true)
     public void deleteProduct(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
