@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -33,5 +35,13 @@ public class SearchService implements SearchServiceApi {
         Search search = Search.of(searchKeyword);
 
         searchRepository.save(search);
+    }
+
+    @Override
+    public List<String> getTopTenKeywords() {
+
+        List<String> keywords = searchRepository.getKeywordByCountTopTen();
+
+        return keywords;
     }
 }

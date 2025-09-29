@@ -1,5 +1,7 @@
 package com.sparta.team5.fractal.domain.search.service;
 
+import java.util.List;
+
 public interface SearchServiceApi {
 
     /*
@@ -13,4 +15,7 @@ public interface SearchServiceApi {
 
     // 서치 저장
     void createSearch(String keyword);
+
+    // 검색 수 많은대로 10위까지 검색어 가져오기
+    List<String> getTopTenKeywords();
 }

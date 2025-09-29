@@ -1,5 +1,6 @@
 package com.sparta.team5.fractal.domain.product.service;
 
+import com.sparta.team5.fractal.common.exception.CommonErrorCode;
 import com.sparta.team5.fractal.common.exception.GlobalException;
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
@@ -16,8 +17,8 @@ import com.sparta.team5.fractal.domain.tag.entity.Tag;
 import com.sparta.team5.fractal.domain.tag.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service
+@Service("productServiceV2")
 @RequiredArgsConstructor
 @Transactional
 public class ProductServiceV2 implements ProductServiceApi {
@@ -36,8 +37,8 @@ public class ProductServiceV2 implements ProductServiceApi {
     private final TagRepository tagRepository;
     private final CategoryRepository categoryRepository;
     private final SearchServiceApi searchServiceApi;
+    private final CacheManager cacheManager;
 
-    @CacheEvict(value = "products", allEntries = true)
     public ProductResponse createProduct(ProductCreateRequest request) {
         Set<Category> categories = processCategories(request.categoryIds());
 
@@ -84,21 +85,42 @@ public class ProductServiceV2 implements ProductServiceApi {
         return productRepository.findAll(pageable);
     }
 
+    @Override
+    public Page<Product> findProductsByTagId(Long tagId, Pageable pageable) {
+        return productRepository.findProductsByTagId(tagId, pageable);
+    }
+
+    @Override
+    public Page<Product> findProductsByCategoryId(Long categoryId, Pageable pageable) {
+        return productRepository.findProductsByCategoryId(categoryId, pageable);
+    }
+
     // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회 V2
+    @Override
     @Transactional
-    @Cacheable(value = "products", key = "#keyword", condition = "#keyword != null")
     public ProductListResponse getProducts(Pageable pageable, String keyword) {
 
-        Page<Product> productPage = productRepository.findAllByKeyword(pageable, keyword);
-
-        if (keyword != null && !searchServiceApi.existAndIncrease(keyword)) {
-            searchServiceApi.createSearch(keyword);
+        Cache cache = cacheManager.getCache("products");
+        if (cache == null) {
+            throw new GlobalException(CommonErrorCode.CACHE_IS_NULL);
         }
+
+        if (keyword != null) {
+            if (!searchServiceApi.existAndIncrease(keyword)) {
+                searchServiceApi.createSearch(keyword);
+            }
+
+            ProductListResponse productListResponse = cache.get(keyword, ProductListResponse.class);
+            if (productListResponse != null) {
+                return productListResponse;
+            }
+        }
+
+        Page<Product> productPage = productRepository.findAllByKeyword(pageable, keyword);
 
         return ProductListResponse.from(productPage);
     }
 
-    @CacheEvict(value = "products", allEntries = true)
     public ProductResponse updateProduct(Long productId, ProductUpdateRequest request) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
@@ -145,7 +167,6 @@ public class ProductServiceV2 implements ProductServiceApi {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    @CacheEvict(value = "products", allEntries = true)
     public void deleteProduct(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));

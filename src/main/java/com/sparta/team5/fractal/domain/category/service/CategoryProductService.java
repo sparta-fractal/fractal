@@ -7,17 +7,24 @@ import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
 import com.sparta.team5.fractal.domain.product.dto.ProductSimpleResponse;
 import com.sparta.team5.fractal.domain.product.entity.Product;
 import com.sparta.team5.fractal.domain.product.service.ProductServiceApi;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class CategoryProductService {
+
     private final ProductServiceApi productServiceApi;
     private final CategoryServiceApi categoryServiceApi;
+
+    public CategoryProductService(@Qualifier("ProductServiceV1") ProductServiceApi productServiceApi,
+                                  CategoryServiceApi categoryServiceApi
+    ) {
+        this.productServiceApi = productServiceApi;
+        this.categoryServiceApi = categoryServiceApi;
+    }
 
     @Transactional(readOnly = true)
     public CategoryProductResponse getCategory(Long categoryId, Pageable pageable) {
@@ -29,6 +36,6 @@ public class CategoryProductService {
 
         Page<ProductSimpleResponse> productDtoPage = productPage.map(ProductSimpleResponse::from);
 
-        return CategoryProductResponse.from(category,productDtoPage);
+        return CategoryProductResponse.from(category, productDtoPage);
     }
 }

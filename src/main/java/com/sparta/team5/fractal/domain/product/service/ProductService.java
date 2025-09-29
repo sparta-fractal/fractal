@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service
+@Service("ProductServiceV1")
 @RequiredArgsConstructor
 @Transactional
 public class ProductService implements ProductServiceApi {
@@ -92,6 +92,7 @@ public class ProductService implements ProductServiceApi {
     }
 
     // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회
+    @Override
     @Transactional
     public ProductListResponse getProducts(Pageable pageable, String keyword) {
 
