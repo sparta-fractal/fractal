@@ -86,6 +86,11 @@ public class ProductService implements ProductServiceApi {
         return productRepository.findProductsByTagId(tagId, pageable);
     }
 
+    @Override
+    public Page<Product> findProductsByCategoryId(Long categoryId, Pageable pageable) {
+        return productRepository.findProductsByCategoryId(categoryId, pageable);
+    }
+
     // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회
     @Transactional
     public ProductListResponse getProducts(Pageable pageable, String keyword) {

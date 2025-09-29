@@ -40,4 +40,6 @@ public interface ProductServiceApi {
     Page<Product> findProductsByTagId(@Param("tagId") Long tagId, Pageable pageable);
 
 
+    Page<Product> findProductsByCategoryId(Long categoryId, Pageable pageable);
+
 }
