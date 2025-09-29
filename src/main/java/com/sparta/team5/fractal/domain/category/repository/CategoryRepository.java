@@ -19,6 +19,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
                 WHERE c.id = :categoryId
                   AND (p.deleted = false OR p IS NULL)
             """)
-
     Optional<Category> findByIdWithProducts(@Param("categoryId") Long categoryId);
 }

@@ -21,10 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -79,6 +75,25 @@ public class ProductService implements ProductServiceApi {
     @Transactional(readOnly = true)
     public Page<Product> findAll(Pageable pageable) {
         return productRepository.findAll(pageable);
+    }
+
+    // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회
+    @Transactional
+    public ProductListResponse getProducts(Pageable pageable, String keyword) {
+
+        Page<Product> productPage = productRepository.findAllByKeyword(pageable, keyword);
+
+        if (keyword != null && !searchServiceApi.existAndIncrease(keyword)) {
+            searchServiceApi.createSearch(keyword);
+        }
+    @Override
+    public Page<Product> findProductsByTagId(Long tagId, Pageable pageable) {
+        return productRepository.findProductsByTagId(tagId, pageable);
+    }
+
+    @Override
+    public Page<Product> findProductsByCategoryId(Long categoryId, Pageable pageable) {
+        return productRepository.findProductsByCategoryId(categoryId, pageable);
     }
 
     // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회
