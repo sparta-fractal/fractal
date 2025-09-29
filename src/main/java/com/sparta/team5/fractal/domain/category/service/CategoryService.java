@@ -2,6 +2,7 @@ package com.sparta.team5.fractal.domain.category.service;
 
 import com.sparta.team5.fractal.common.exception.GlobalException;
 import com.sparta.team5.fractal.domain.category.dto.CategoryCreateRequest;
+import com.sparta.team5.fractal.domain.category.dto.CategoryProductResponse;
 import com.sparta.team5.fractal.domain.category.dto.CategoryResponse;
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
@@ -14,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class CategoryService implements CategoryServiceApi {
 
     private final CategoryRepository categoryRepository;
@@ -28,6 +28,16 @@ public class CategoryService implements CategoryServiceApi {
                 .map(CategoryResponse::from)
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public CategoryProductResponse getCategory(Long categoryId) {
+
+        Category category = categoryRepository.findByIdWithProducts(categoryId)
+                .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+
+        return CategoryProductResponse.from(category);
+    }
+
 
     @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest request) {
@@ -89,3 +99,5 @@ public class CategoryService implements CategoryServiceApi {
         return categoryRepository.findById(Id);
     }
 }
+
+
