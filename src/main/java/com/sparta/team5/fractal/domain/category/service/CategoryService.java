@@ -2,11 +2,11 @@ package com.sparta.team5.fractal.domain.category.service;
 
 import com.sparta.team5.fractal.common.exception.GlobalException;
 import com.sparta.team5.fractal.domain.category.dto.CategoryCreateRequest;
-import com.sparta.team5.fractal.domain.category.dto.CategoryProductResponse;
 import com.sparta.team5.fractal.domain.category.dto.CategoryResponse;
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
 import com.sparta.team5.fractal.domain.category.repository.CategoryRepository;
+import com.sparta.team5.fractal.domain.product.service.ProductServiceApi;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -28,16 +28,6 @@ public class CategoryService implements CategoryServiceApi {
                 .map(CategoryResponse::from)
                 .toList();
     }
-
-    @Transactional(readOnly = true)
-    public CategoryProductResponse getCategory(Long categoryId) {
-
-        Category category = categoryRepository.findByIdWithProducts(categoryId)
-                .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
-
-        return CategoryProductResponse.from(category);
-    }
-
 
     @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest request) {
@@ -97,6 +87,11 @@ public class CategoryService implements CategoryServiceApi {
     @Transactional(readOnly = true)
     public Optional<Category> findById(Long Id) {
         return categoryRepository.findById(Id);
+    }
+
+    @Override
+    public Optional<Category> findByIdWithProducts(Long categoryId) {
+        return categoryRepository.findById(categoryId);
     }
 }
 
