@@ -21,14 +21,16 @@ public record CategoryProductResponse(
                 .collect(Collectors.toList());
 
         // 부모 카테고리가 없는 경우(최상위 카테고리)를 대비해 null 처리
-        Long parentId = (category.getParentCategory() != null) ? category.getParentCategory().getId() : null;
+        Long parentId = java.util.Optional.ofNullable(category.getParentCategory())
+                .map(com.sparta.team5.fractal.domain.category.entity.Category::getId)
+                .orElse(null);
 
         return new CategoryProductResponse(
                 category.getId(),
                 category.getName(),
-                parentId, // 누락되었던 parentCategoryId 추가
-                category.getCreatedAt(), // 누락되었던 createdAt 추가
-                category.getUpdatedAt(), // 누락되었던 updatedAt 추가
+                parentId,
+                category.getCreatedAt(),
+                category.getUpdatedAt(),
                 productResponses
         );
     }

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-
 @RequiredArgsConstructor
 public class CategoryController {
 
@@ -42,7 +41,7 @@ public class CategoryController {
 
         CategoryProductResponse category = categoryService.getCategory(categoryId);
 
-        return ApiResponse.success(category, "태그를 조회하였습니다.");
+        return ApiResponse.success(category, "카테고리를 조회하였습니다.");
     }
 
     /**
@@ -54,6 +53,7 @@ public class CategoryController {
     @PostMapping("/api/v1/categories")
     public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(
             @Valid @RequestBody CategoryCreateRequest request) {
+
         CategoryResponse categoryResponse = categoryService.createCategory(request);
 
         return ApiResponse.success(categoryResponse, "카테고리가 성공적으로 생성되었습니다.");
