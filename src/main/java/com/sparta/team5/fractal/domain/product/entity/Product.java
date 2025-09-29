@@ -20,7 +20,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "products")
-//@SQLRestriction("is_deleted = false")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Product extends BaseEntity {
