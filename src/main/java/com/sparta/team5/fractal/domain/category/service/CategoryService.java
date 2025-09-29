@@ -2,6 +2,7 @@ package com.sparta.team5.fractal.domain.category.service;
 
 import com.sparta.team5.fractal.common.exception.GlobalException;
 import com.sparta.team5.fractal.domain.category.dto.CategoryCreateRequest;
+import com.sparta.team5.fractal.domain.category.dto.CategoryProductResponse;
 import com.sparta.team5.fractal.domain.category.dto.CategoryResponse;
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
@@ -14,8 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
-public class CategoryService {
+public class CategoryService implements CategoryServiceApi {
 
     private final CategoryRepository categoryRepository;
 
@@ -30,10 +30,16 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Category> findById(Long categoryId) {
-        return categoryRepository.findById(categoryId);
+    public CategoryProductResponse getCategory(Long categoryId) {
+
+        Category category = categoryRepository.findByIdWithProducts(categoryId)
+                .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+
+        return CategoryProductResponse.from(category);
     }
 
+
+    @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest request) {
         // 중복 카테고리명 체크
         if (categoryRepository.existsByName(request.name())) {
@@ -53,6 +59,7 @@ public class CategoryService {
         return CategoryResponse.from(savedCategory);
     }
 
+    @Transactional
     public CategoryResponse updateCategory(Long categoryId, CategoryCreateRequest request) {
 
         Category category = categoryRepository.findById(categoryId)
@@ -76,6 +83,7 @@ public class CategoryService {
         return CategoryResponse.from(updatedCategory);
     }
 
+    @Transactional
     public void deleteCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
@@ -84,4 +92,12 @@ public class CategoryService {
 
         categoryRepository.save(category);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Category> findById(Long Id) {
+        return categoryRepository.findById(Id);
+    }
 }
+
+

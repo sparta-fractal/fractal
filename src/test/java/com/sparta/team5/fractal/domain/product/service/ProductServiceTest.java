@@ -2,6 +2,7 @@ package com.sparta.team5.fractal.domain.product.service;
 
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.category.repository.CategoryRepository;
+import com.sparta.team5.fractal.domain.category.service.CategoryServiceApi;
 import com.sparta.team5.fractal.domain.product.dto.ProductCreateRequest;
 import com.sparta.team5.fractal.domain.product.dto.ProductResponse;
 import com.sparta.team5.fractal.domain.product.dto.ProductUpdateRequest;
@@ -9,6 +10,7 @@ import com.sparta.team5.fractal.domain.product.entity.Product;
 import com.sparta.team5.fractal.domain.product.repository.ProductRepository;
 import com.sparta.team5.fractal.domain.tag.entity.Tag;
 import com.sparta.team5.fractal.domain.tag.repository.TagRepository;
+import com.sparta.team5.fractal.domain.tag.service.TagServiceApi;
 import com.sparta.team5.fractal.common.exception.GlobalException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,12 @@ class ProductServiceTest {
     @Mock
     private CategoryRepository categoryRepository;
 
+    @Mock
+    private TagServiceApi tagServiceApi;
+
+    @Mock
+    private CategoryServiceApi categoryServiceApi;
+
     @InjectMocks
     private ProductService productService;
 
@@ -63,10 +71,10 @@ class ProductServiceTest {
 
         Product savedProduct = Product.of("갤럭시 워치 4", BigDecimal.valueOf(100000), "최신형 전자기기");
 
-        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category1));
-        when(categoryRepository.findById(2L)).thenReturn(Optional.of(category2));
-        when(tagRepository.findByName("시계")).thenReturn(Optional.of(tag1));
-        when(tagRepository.findByName("트랜디")).thenReturn(Optional.of(tag2));
+        when(categoryServiceApi.findById(1L)).thenReturn(Optional.of(category1));
+        when(categoryServiceApi.findById(2L)).thenReturn(Optional.of(category2));
+        when(tagServiceApi.findByName("시계")).thenReturn(Optional.of(tag1));
+        when(tagServiceApi.findByName("트랜디")).thenReturn(Optional.of(tag2));
         when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
 
         // when
@@ -78,8 +86,8 @@ class ProductServiceTest {
         assertThat(response.price()).isEqualTo(BigDecimal.valueOf(100000));
         assertThat(response.description()).isEqualTo("최신형 전자기기");
 
-        verify(categoryRepository, times(2)).findById(any(Long.class));
-        verify(tagRepository, times(2)).findByName(any(String.class));
+        verify(categoryServiceApi, times(2)).findById(any(Long.class));
+        verify(tagServiceApi, times(2)).findByName(any(String.class));
         verify(productRepository).save(any(Product.class));
     }
 
@@ -95,14 +103,14 @@ class ProductServiceTest {
             List.of("시계")
         );
 
-        when(categoryRepository.findById(999L)).thenReturn(Optional.empty());
+        when(categoryServiceApi.findById(999L)).thenReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> productService.createProduct(request))
                 .isInstanceOf(GlobalException.class)
                 .hasMessage("[CATEGORY_001] 404 NOT_FOUND - 카테고리를 찾을 수 없습니다.");
 
-        verify(categoryRepository).findById(999L);
+        verify(categoryServiceApi).findById(999L);
         verify(productRepository, never()).save(any(Product.class));
     }
 
@@ -184,9 +192,9 @@ class ProductServiceTest {
         Tag tag2 = Tag.from("최신");
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
-        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-        when(tagRepository.findByName("시계")).thenReturn(Optional.of(tag1));
-        when(tagRepository.findByName("최신")).thenReturn(Optional.of(tag2));
+        when(categoryServiceApi.findById(1L)).thenReturn(Optional.of(category));
+        when(tagServiceApi.findByName("시계")).thenReturn(Optional.of(tag1));
+        when(tagServiceApi.findByName("최신")).thenReturn(Optional.of(tag2));
         when(productRepository.save(any(Product.class))).thenReturn(existingProduct);
 
         // when
@@ -196,8 +204,8 @@ class ProductServiceTest {
         assertThat(response).isNotNull();
 
         verify(productRepository).findById(productId);
-        verify(categoryRepository).findById(1L);
-        verify(tagRepository, times(2)).findByName(any(String.class));
+        verify(categoryServiceApi).findById(1L);
+        verify(tagServiceApi, times(2)).findByName(any(String.class));
         verify(productRepository).save(any(Product.class));
     }
 

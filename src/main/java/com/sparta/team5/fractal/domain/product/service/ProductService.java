@@ -4,6 +4,10 @@ import com.sparta.team5.fractal.common.exception.GlobalException;
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
 import com.sparta.team5.fractal.domain.category.repository.CategoryRepository;
+import com.sparta.team5.fractal.common.exception.GlobalException;
+import com.sparta.team5.fractal.domain.category.entity.Category;
+import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
+import com.sparta.team5.fractal.domain.category.service.CategoryServiceApi;
 import com.sparta.team5.fractal.domain.product.dto.ProductCreateRequest;
 import com.sparta.team5.fractal.domain.product.dto.ProductListResponse;
 import com.sparta.team5.fractal.domain.product.dto.ProductResponse;
@@ -14,6 +18,13 @@ import com.sparta.team5.fractal.domain.product.repository.ProductRepository;
 import com.sparta.team5.fractal.domain.search.service.SearchServiceApi;
 import com.sparta.team5.fractal.domain.tag.entity.Tag;
 import com.sparta.team5.fractal.domain.tag.repository.TagRepository;
+import com.sparta.team5.fractal.domain.tag.service.TagServiceApi;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,6 +45,8 @@ public class ProductService implements ProductServiceApi {
     private final TagRepository tagRepository;
     private final CategoryRepository categoryRepository;
     private final SearchServiceApi searchServiceApi;
+    private final TagServiceApi tagServiceApi;
+    private final CategoryServiceApi categoryServiceApi;
 
     public ProductResponse createProduct(ProductCreateRequest request) {
         Set<Category> categories = processCategories(request.categoryIds());
@@ -122,7 +135,7 @@ public class ProductService implements ProductServiceApi {
         }
 
         return categoryIds.stream()
-                .map(categoryId -> categoryRepository.findById(categoryId)
+                .map(categoryId -> categoryServiceApi.findById(categoryId)
                         .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND)))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
@@ -135,8 +148,8 @@ public class ProductService implements ProductServiceApi {
         return tagNames.stream()
                 .map(name -> name == null ? "" : name.trim())
                 .filter(s -> !s.isEmpty())
-                .map(name -> tagRepository.findByName(name)
-                        .orElseGet(() -> tagRepository.save(Tag.from(name))))
+                .map(name -> tagServiceApi.findByName(name)
+                        .orElseGet(() -> tagServiceApi.createTag(name)))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
