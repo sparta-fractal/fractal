@@ -23,7 +23,7 @@ public class ProductController {
 
     /**
      * 새로운 상품을 생성하는 엔드포인트
-     * 
+     *
      * @param request 상품 생성 요청 정보
      * @return 생성된 상품 정보
      */
@@ -36,7 +36,7 @@ public class ProductController {
 
     /**
      * 상품 단건 조회 엔드포인트
-     * 
+     *
      * @param productId 조회할 상품 ID
      * @return 조회된 상품 정보
      */
@@ -49,29 +49,31 @@ public class ProductController {
 
     /**
      * 상품 목록 페이징 조회 엔드포인트
-     * 
+     *
      * @param pageable 페이징 정보 (page, size, sort)
      * @return 페이징된 상품 목록
+     * + RequestParam String keyword 추가
      */
     @GetMapping
     public ResponseEntity<ApiResponse<ProductListResponse>> getProducts(
-        @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        
-        ProductListResponse productListResponse = productService.getProducts(pageable);
+            @RequestParam(required = false) String keyword,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        ProductListResponse productListResponse = productService.getProducts(pageable, keyword);
 
         return ApiResponse.success(productListResponse, "상품 목록 조회에 성공했습니다.");
     }
 
     /**
      * 상품 수정 엔드포인트
-     * 
+     *
      * @param productId 수정할 상품 ID
-     * @param request 상품 수정 요청 정보
+     * @param request   상품 수정 요청 정보
      * @return 수정된 상품 정보
      */
     @PutMapping("/{productId}")
-    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(@PathVariable Long productId, 
-                                                                     @Valid @RequestBody ProductUpdateRequest request) {
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(@PathVariable Long productId,
+                                                                      @Valid @RequestBody ProductUpdateRequest request) {
         ProductResponse productResponse = productService.updateProduct(productId, request);
 
         return ApiResponse.success(productResponse, "상품이 성공적으로 수정되었습니다.");

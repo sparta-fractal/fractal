@@ -11,26 +11,27 @@ import com.sparta.team5.fractal.domain.product.dto.ProductUpdateRequest;
 import com.sparta.team5.fractal.domain.product.entity.Product;
 import com.sparta.team5.fractal.domain.product.exception.ProductErrorCode;
 import com.sparta.team5.fractal.domain.product.repository.ProductRepository;
+import com.sparta.team5.fractal.domain.search.service.SearchServiceApi;
 import com.sparta.team5.fractal.domain.tag.entity.Tag;
 import com.sparta.team5.fractal.domain.tag.service.TagServiceApi;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ProductService implements ProductServiceApi {
 
     private final ProductRepository productRepository;
+    private final SearchServiceApi searchServiceApi;
     private final TagServiceApi tagServiceApi;
     private final CategoryServiceApi categoryServiceApi;
 
@@ -80,9 +81,15 @@ public class ProductService implements ProductServiceApi {
         return productRepository.findAll(pageable);
     }
 
-    @Transactional(readOnly = true)
-    public ProductListResponse getProducts(Pageable pageable) {
-        Page<Product> productPage = productRepository.findAll(pageable);
+    // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회
+    @Transactional
+    public ProductListResponse getProducts(Pageable pageable, String keyword) {
+
+        Page<Product> productPage = productRepository.findAllByKeyword(pageable, keyword);
+
+        if (keyword != null && !searchServiceApi.existAndIncrease(keyword)) {
+            searchServiceApi.createSearch(keyword);
+        }
 
         return ProductListResponse.from(productPage);
     }

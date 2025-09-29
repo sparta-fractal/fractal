@@ -10,10 +10,14 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
 
     Optional<Tag> findByName(String name);
 
-    @Query("SELECT t FROM Tag t " +
-            "LEFT JOIN FETCH t.productTags pt " +
-            "LEFT JOIN FETCH pt.product p " +
-            "WHERE t.id = :tagId")
+    @Query("""
+            SELECT DISTINCT t
+            FROM Tag t
+            LEFT JOIN FETCH t.productTags pt
+            LEFT JOIN FETCH pt.product p
+            WHERE t.id = :tagId
+              AND (p.deleted = false OR p IS NULL)
+            """)
     Optional<Tag> findByIdWithProducts(@Param("tagId") Long tagId);
 }
 
