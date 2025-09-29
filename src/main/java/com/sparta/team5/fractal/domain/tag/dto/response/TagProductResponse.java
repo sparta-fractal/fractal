@@ -12,7 +12,6 @@ public record TagProductResponse(
 ) {
     public static TagProductResponse from(Tag tag, Page<ProductSimpleResponse> productPage) {
 
-
         return new TagProductResponse(
                 tag.getId(),
                 tag.getName(),
