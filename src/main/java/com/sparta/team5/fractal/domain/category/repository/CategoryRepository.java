@@ -10,6 +10,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     boolean existsByName(String name);
 
 
+
     @Query("""
                 SELECT DISTINCT c
                 FROM Category c
@@ -18,5 +19,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
                 WHERE c.id = :categoryId
                   AND (p.deleted = false OR p IS NULL)
             """)
+
     Optional<Category> findByIdWithProducts(@Param("categoryId") Long categoryId);
 }
