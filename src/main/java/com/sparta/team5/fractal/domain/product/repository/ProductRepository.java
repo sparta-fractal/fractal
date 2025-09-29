@@ -13,7 +13,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("""            
             SELECT p
             FROM Product p
-            WHERE :keyword IS NULL OR p.title LIKE %:keyword% OR p.description LIKE %:keyword%
+            WHERE (:keyword IS NULL OR p.title LIKE %:keyword% OR p.description LIKE %:keyword%)
+            AND (p.deleted != true)
             ORDER BY p.createdAt DESC
             """)
     Page<Product> findAllByKeyword(Pageable pageable,
