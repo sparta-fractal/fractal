@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
+import org.springframework.data.repository.query.Param;
 
 public interface ProductServiceApi {
 
@@ -34,4 +35,11 @@ public interface ProductServiceApi {
      * @return 페이징된 상품 목록
      */
     Page<Product> findAll(Pageable pageable);
+
+
+    Page<Product> findProductsByTagId(@Param("tagId") Long tagId, Pageable pageable);
+
+
+    Page<Product> findProductsByCategoryId(Long categoryId, Pageable pageable);
+
 }
