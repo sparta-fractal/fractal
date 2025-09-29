@@ -2,6 +2,7 @@ package com.sparta.team5.fractal.domain.category.controller;
 
 import com.sparta.team5.fractal.common.response.ApiResponse;
 import com.sparta.team5.fractal.domain.category.dto.CategoryCreateRequest;
+import com.sparta.team5.fractal.domain.category.dto.CategoryProductResponse;
 import com.sparta.team5.fractal.domain.category.dto.CategoryResponse;
 import com.sparta.team5.fractal.domain.category.service.CategoryService;
 import jakarta.validation.Valid;
@@ -14,11 +15,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/categories")
+
 @RequiredArgsConstructor
 public class CategoryController {
 
@@ -29,12 +29,20 @@ public class CategoryController {
      *
      * @return 카테고리 목록
      */
-    @GetMapping
+    @GetMapping("/api/v1/categories")
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getAllCategories() {
 
         List<CategoryResponse> categories = categoryService.getAllCategories();
 
         return ApiResponse.success(categories, "카테고리 목록을 성공적으로 조회했습니다.");
+    }
+
+    @GetMapping("/api/v1/categories/{categoryId}")
+    public ResponseEntity<ApiResponse<CategoryProductResponse>> getCategory(@PathVariable Long categoryId) {
+
+        CategoryProductResponse category = categoryService.getCategory(categoryId);
+
+        return ApiResponse.success(category, "태그를 조회하였습니다.");
     }
 
     /**
@@ -43,7 +51,7 @@ public class CategoryController {
      * @param request 카테고리 생성 요청 정보
      * @return 생성된 카테고리 정보
      */
-    @PostMapping
+    @PostMapping("/api/v1/categories")
     public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(
             @Valid @RequestBody CategoryCreateRequest request) {
         CategoryResponse categoryResponse = categoryService.createCategory(request);
@@ -58,7 +66,8 @@ public class CategoryController {
      * @param request    카테고리 수정 요청 정보
      * @return 수정된 카테고리 정보
      */
-    @PutMapping("/{categoryId}")
+
+    @PutMapping("/api/v1/categories/{categoryId}")
     public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
             @PathVariable Long categoryId,
             @Valid @RequestBody CategoryCreateRequest request) {
@@ -74,7 +83,7 @@ public class CategoryController {
      * @param categoryId 삭제할 카테고리 ID
      * @return 성공 응답
      */
-    @DeleteMapping("/{categoryId}")
+    @DeleteMapping("/api/v1/categories/{categoryId}")
     public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable Long categoryId) {
 
         categoryService.deleteCategory(categoryId);
