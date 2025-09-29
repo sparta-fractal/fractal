@@ -19,4 +19,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             """)
     Page<Product> findAllByKeyword(Pageable pageable,
                                    @Param("keyword") String keyword);
+
+
+    @Query("SELECT p FROM Product p JOIN p.productTags pt WHERE pt.tag.id = :tagId AND p.deleted = false")
+    Page<Product> findProductsByTagId(@Param("tagId") Long tagId, Pageable pageable);
 }
