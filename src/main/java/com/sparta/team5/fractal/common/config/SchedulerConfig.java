@@ -21,6 +21,6 @@ public class SchedulerConfig {
     @Transactional(readOnly = true)
     public void productCacheEvict() {
 
-        cacheEvictService.productCacheEvict();
+        cacheEvictService.refreshTopKeywordProductCache();
     }
 }

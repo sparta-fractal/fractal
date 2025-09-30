@@ -20,7 +20,7 @@ public class CacheEvictAspect {
             "execution(* com.sparta.team5.fractal.domain.product.service.ProductService.deleteProduct(..)))")
     public void productCacheEvict() {
 
-        cacheEvictService.productCacheEvict();
+        cacheEvictService.refreshTopKeywordProductCache();
     }
 }
 

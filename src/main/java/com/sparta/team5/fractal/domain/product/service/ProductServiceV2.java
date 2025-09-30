@@ -40,6 +40,7 @@ public class ProductServiceV2 {
 
             ProductListResponse productListResponse = cache.get(keyword, ProductListResponse.class);
             if (productListResponse != null) {
+                
                 return productListResponse;
             }
         }

@@ -27,7 +27,7 @@ public class CacheEvictService {
     /**
      * products 캐시 초기화 후 데이터 집어넣는 메서드
      */
-    public void productCacheEvict() {
+    public void refreshTopKeywordProductCache() {
 
         // 캐시 찾기
         Cache cache = cacheManager.getCache("products");
