@@ -28,7 +28,7 @@ public class CategoryProductServiceV2 {
             key = "'category:' + #categoryId + ':page:' + #pageable.pageNumber + ':size:' + #pageable.pageSize + ':sort:' + #pageable.sort"
     )
     public CategoryProductResponse getCategory(Long categoryId, Pageable pageable) {
-        log.info("Cache miss!");
+        log.debug("Cache miss for categoryId: {}, pageable: {}", categoryId, pageable);
 
         Category category = categoryServiceApi.findById(categoryId)
                 .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));

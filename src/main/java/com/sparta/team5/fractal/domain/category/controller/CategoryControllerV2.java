@@ -18,16 +18,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v2/categories")
 public class CategoryControllerV2 {
     private final CategoryServiceV2 categoryServiceV2;
     private final CategoryProductServiceV2 categoryProductServiceV2;
 
 
-    @GetMapping("/api/v2/categories/{categoryId}")
+    @GetMapping("/{categoryId}")
     public ResponseEntity<ApiResponse<CategoryProductResponse>> getCategory(
             @PathVariable Long categoryId,
             @PageableDefault(size = 30, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
@@ -38,7 +40,7 @@ public class CategoryControllerV2 {
         return ApiResponse.success(category, "카테고리를 조회하였습니다.");
     }
 
-    @PostMapping("/api/v2/categories")
+    @PostMapping
     public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(
             @Valid @RequestBody CategoryCreateRequest request) {
 
@@ -55,7 +57,7 @@ public class CategoryControllerV2 {
      * @return 수정된 카테고리 정보
      */
 
-    @PutMapping("/api/v2/categories/{categoryId}")
+    @PutMapping("/{categoryId}")
     public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
             @PathVariable Long categoryId,
             @Valid @RequestBody CategoryCreateRequest request) {

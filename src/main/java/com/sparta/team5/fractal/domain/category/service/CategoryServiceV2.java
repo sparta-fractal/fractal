@@ -19,7 +19,6 @@ public class CategoryServiceV2 {
     private final CategoryRepository categoryRepository;
 
     @Transactional
-    @CacheEvict(value = "categoryProducts", allEntries = true)
     public CategoryResponse createCategory(CategoryCreateRequest request) {
 
         // 중복 카테고리명 체크
