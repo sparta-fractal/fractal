@@ -55,6 +55,10 @@ public class Product extends BaseEntity {
     }
 
     public void replaceTags(Set<Tag> newTags) {
+        if (newTags == null) {
+            this.productTags.clear();
+            return;
+        }
 
         Set<Tag> currentTags = this.productTags.stream()
                 .map(ProductTag::getTag)
@@ -63,7 +67,12 @@ public class Product extends BaseEntity {
         Set<Tag> toAdd = new HashSet<>(newTags);
         toAdd.removeAll(currentTags);
 
-        toAdd.forEach(tag -> this.productTags.add(ProductTag.of(this, tag)));
+        for (Tag tag : toAdd) {
+            if (tag == null) {
+                throw new IllegalArgumentException("태그는 null일 수 없습니다.");
+            }
+            this.productTags.add(ProductTag.of(this, tag));
+        }
 
         Set<Tag> toRemove = new HashSet<>(currentTags);
         toRemove.removeAll(newTags);
