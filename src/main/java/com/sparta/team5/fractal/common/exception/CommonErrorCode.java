@@ -17,7 +17,9 @@ public enum CommonErrorCode implements ErrorCode {
 
     SERVER_ERROR("SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
 
-    AUTH_ANNOTATION_MISMATCH("AUTH_ANNOTATION_MISMATCH", HttpStatus.BAD_REQUEST, "@Auth와 AuthUser 타입은 함께 사용되어야 합니다.");
+    AUTH_ANNOTATION_MISMATCH("AUTH_ANNOTATION_MISMATCH", HttpStatus.BAD_REQUEST, "@Auth와 AuthUser 타입은 함께 사용되어야 합니다."),
+
+    CACHE_IS_NULL("CACHE_IS_NULL", HttpStatus.INTERNAL_SERVER_ERROR, "해당 캐시는 존재하지 않습니다.");
 
     private final String code;
     private final HttpStatus httpStatus;

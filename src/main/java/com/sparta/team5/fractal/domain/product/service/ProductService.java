@@ -1,5 +1,6 @@
 package com.sparta.team5.fractal.domain.product.service;
 
+import com.sparta.team5.fractal.common.exception.CommonErrorCode;
 import com.sparta.team5.fractal.common.exception.GlobalException;
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
@@ -16,8 +17,12 @@ import com.sparta.team5.fractal.domain.tag.entity.Tag;
 import com.sparta.team5.fractal.domain.tag.service.TagServiceApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +39,7 @@ public class ProductService implements ProductServiceApi {
     private final SearchServiceApi searchServiceApi;
     private final TagServiceApi tagServiceApi;
     private final CategoryServiceApi categoryServiceApi;
+    private final CacheManager cacheManager;
 
     public ProductResponse createProduct(ProductCreateRequest request) {
         Set<Category> categories = processCategories(request.categoryIds());
@@ -91,7 +97,7 @@ public class ProductService implements ProductServiceApi {
         return productRepository.findProductsByCategoryId(categoryId, pageable);
     }
 
-    // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회
+    // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회 v1
     @Transactional
     public ProductListResponse getProducts(Pageable pageable, String keyword) {
 
@@ -102,6 +108,59 @@ public class ProductService implements ProductServiceApi {
         }
 
         return ProductListResponse.from(productPage);
+    }
+
+
+    // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회 v2
+    @Override
+    @Transactional
+    public ProductListResponse getProductsV2(Pageable pageable, String keyword) {
+
+        Cache cache = cacheManager.getCache("products");
+        if (cache == null) {
+            throw new GlobalException(CommonErrorCode.CACHE_IS_NULL);
+        }
+
+        if (keyword != null) {
+            if (!searchServiceApi.existAndIncrease(keyword)) {
+                searchServiceApi.createSearch(keyword);
+            }
+
+            ProductListResponse productListResponse = cache.get(keyword, ProductListResponse.class);
+            if (productListResponse != null) {
+                return productListResponse;
+            }
+        }
+
+        Page<Product> productPage = productRepository.findAllByKeyword(pageable, keyword);
+
+        return ProductListResponse.from(productPage);
+    }
+
+    @Override
+    public void productCacheEvict() {
+
+        // 캐시 찾기
+        Cache cache = cacheManager.getCache("products");
+        if (cache == null) {
+            throw new GlobalException(CommonErrorCode.CACHE_IS_NULL);
+        }
+        // 캐시 초기화
+        cache.clear();
+
+        List<String> keywords = searchServiceApi.getTopTenKeywords();
+        
+        Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        keywords.forEach(keyword -> {
+            // 키워드로 조회 후
+            ProductListResponse products = getProductsV2(pageable, keyword);
+
+            // 캐시에 저장
+            cache.put(keyword, products);
+
+            log.info("Cache Evicted products for: {}", keyword);
+        });
     }
 
     public ProductResponse updateProduct(Long productId, ProductUpdateRequest request) {

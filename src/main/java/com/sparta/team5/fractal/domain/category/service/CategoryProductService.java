@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CategoryProductService {
+
     private final ProductServiceApi productServiceApi;
     private final CategoryServiceApi categoryServiceApi;
 
@@ -29,6 +30,6 @@ public class CategoryProductService {
 
         Page<ProductSimpleResponse> productDtoPage = productPage.map(ProductSimpleResponse::from);
 
-        return CategoryProductResponse.from(category,productDtoPage);
+        return CategoryProductResponse.from(category, productDtoPage);
     }
 }
