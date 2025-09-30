@@ -1,6 +1,7 @@
 package com.sparta.team5.fractal.domain.search.repository;
 
 import com.sparta.team5.fractal.domain.search.entity.Search;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -14,7 +15,6 @@ public interface SearchRepository extends JpaRepository<Search, Long> {
             SELECT s.keyword
             FROM Search s
             ORDER BY s.count DESC
-            LIMIT 10
             """)
-    List<String> getKeywordByCountTopTen();
+    List<String> getKeywordByCountTopTen(Pageable pageable);
 }
