@@ -32,7 +32,7 @@ public class CacheConfig {
                         .maximumSize(1000)
                         .build());
 
-        CaffeineCache categoryProducts = new CaffeineCache("CategoryProducts",
+        CaffeineCache categoryProducts = new CaffeineCache("categoryProducts",
                 Caffeine.newBuilder()
                         // 10분 동안 쓰기가 없으면 만료
                         .expireAfterWrite(10, TimeUnit.MINUTES)
