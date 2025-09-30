@@ -41,20 +41,4 @@ public interface ProductServiceApi {
     Page<Product> findProductsByTagId(@Param("tagId") Long tagId, Pageable pageable);
 
     Page<Product> findProductsByCategoryId(Long categoryId, Pageable pageable);
-
-    /**
-     * 페이징된 전체 상품 목록을 조회합니다.
-     * 삭제되지 않은 상품들만 조회됩니다.
-     *
-     * @param pageable 페이징 정보 (페이지 번호, 크기, 정렬)
-     * @param keyword  검색 키워드
-     * @return 페이징된 전체 상품 목록
-     */
-    ProductListResponse getProductsV2(Pageable pageable, String keyword);
-
-    /**
-     * 캐시를 초기화합니다.
-     * 검색어 조회가 많은 순으로 10개의 데이터를 캐시에 저장합니다.
-     */
-    void productCacheEvict();
 }
