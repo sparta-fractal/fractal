@@ -1,5 +1,6 @@
 package com.sparta.team5.fractal.domain.product.service;
 
+import com.sparta.team5.fractal.common.exception.CommonErrorCode;
 import com.sparta.team5.fractal.common.exception.GlobalException;
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
@@ -16,6 +17,8 @@ import com.sparta.team5.fractal.domain.tag.entity.Tag;
 import com.sparta.team5.fractal.domain.tag.service.TagServiceApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,7 +28,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service("ProductServiceV1")
+@Service
 @RequiredArgsConstructor
 @Transactional
 public class ProductService implements ProductServiceApi {
@@ -34,6 +37,7 @@ public class ProductService implements ProductServiceApi {
     private final SearchServiceApi searchServiceApi;
     private final TagServiceApi tagServiceApi;
     private final CategoryServiceApi categoryServiceApi;
+    private final CacheManager cacheManager;
 
     public ProductResponse createProduct(ProductCreateRequest request) {
         Set<Category> categories = processCategories(request.categoryIds());
@@ -91,8 +95,7 @@ public class ProductService implements ProductServiceApi {
         return productRepository.findProductsByCategoryId(categoryId, pageable);
     }
 
-    // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회
-    @Override
+    // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회 v1
     @Transactional
     public ProductListResponse getProducts(Pageable pageable, String keyword) {
 
@@ -101,6 +104,33 @@ public class ProductService implements ProductServiceApi {
         if (keyword != null && !searchServiceApi.existAndIncrease(keyword)) {
             searchServiceApi.createSearch(keyword);
         }
+
+        return ProductListResponse.from(productPage);
+    }
+
+
+    // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회 v2
+    @Override
+    @Transactional
+    public ProductListResponse getProductsV2(Pageable pageable, String keyword) {
+
+        Cache cache = cacheManager.getCache("products");
+        if (cache == null) {
+            throw new GlobalException(CommonErrorCode.CACHE_IS_NULL);
+        }
+
+        if (keyword != null) {
+            if (!searchServiceApi.existAndIncrease(keyword)) {
+                searchServiceApi.createSearch(keyword);
+            }
+
+            ProductListResponse productListResponse = cache.get(keyword, ProductListResponse.class);
+            if (productListResponse != null) {
+                return productListResponse;
+            }
+        }
+
+        Page<Product> productPage = productRepository.findAllByKeyword(pageable, keyword);
 
         return ProductListResponse.from(productPage);
     }

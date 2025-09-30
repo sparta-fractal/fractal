@@ -5,8 +5,8 @@ import com.sparta.team5.fractal.common.exception.GlobalException;
 import com.sparta.team5.fractal.domain.product.dto.ProductListResponse;
 import com.sparta.team5.fractal.domain.product.service.ProductServiceApi;
 import com.sparta.team5.fractal.domain.search.service.SearchServiceApi;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Configuration;
@@ -22,21 +22,12 @@ import java.util.List;
 @Slf4j
 @Configuration
 @EnableScheduling
+@RequiredArgsConstructor
 public class SchedulerConfig {
 
     private final ProductServiceApi productServiceApi;
     private final SearchServiceApi searchServiceApi;
     private final CacheManager cacheManager;
-
-    public SchedulerConfig(@Qualifier("productServiceV2") ProductServiceApi productServiceApi,
-                           SearchServiceApi searchServiceApi,
-                           CacheManager cacheManager
-    ) {
-        this.productServiceApi = productServiceApi;
-        this.searchServiceApi = searchServiceApi;
-        this.cacheManager = cacheManager;
-    }
-
 
     // 밀리초 단위로 계산
     @Scheduled(fixedRate = 60000)
@@ -57,7 +48,7 @@ public class SchedulerConfig {
 
         keywords.forEach(keyword -> {
             // 키워드로 조회 후
-            ProductListResponse products = productServiceApi.getProducts(pageable, keyword);
+            ProductListResponse products = productServiceApi.getProductsV2(pageable, keyword);
 
             // 캐시에 저장
             cache.put(keyword, products);

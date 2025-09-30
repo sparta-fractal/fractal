@@ -11,27 +11,19 @@ import com.sparta.team5.fractal.domain.product.service.ProductServiceApi;
 import com.sparta.team5.fractal.domain.user.entity.User;
 import com.sparta.team5.fractal.domain.user.exception.UserErrorCode;
 import com.sparta.team5.fractal.domain.user.service.UserServiceApi;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class CommentService implements CommentServiceApi {
 
     private final CommentRepository commentRepository;
     private final UserServiceApi userService;
     private final ProductServiceApi productService;
-
-    public CommentService(CommentRepository commentRepository,
-                          UserServiceApi userService,
-                          @Qualifier("ProductServiceV1") ProductServiceApi productService
-    ) {
-        this.commentRepository = commentRepository;
-        this.userService = userService;
-        this.productService = productService;
-    }
 
     @Transactional
     public CommentResponse createComment(Long productId, CommentRequest request, Long userid) {

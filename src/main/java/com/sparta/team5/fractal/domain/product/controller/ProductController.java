@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/products")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -27,7 +27,7 @@ public class ProductController {
      * @param request 상품 생성 요청 정보
      * @return 생성된 상품 정보
      */
-    @PostMapping
+    @PostMapping("/v1/products")
     public ResponseEntity<ApiResponse<ProductResponse>> createProduct(@Valid @RequestBody ProductCreateRequest request) {
         ProductResponse productResponse = productService.createProduct(request);
 
@@ -40,7 +40,7 @@ public class ProductController {
      * @param productId 조회할 상품 ID
      * @return 조회된 상품 정보
      */
-    @GetMapping("/{productId}")
+    @GetMapping("/v1/products/{productId}")
     public ResponseEntity<ApiResponse<ProductResponse>> getProduct(@PathVariable Long productId) {
         ProductResponse productResponse = productService.getProduct(productId);
 
@@ -54,12 +54,29 @@ public class ProductController {
      * @return 페이징된 상품 목록
      * + RequestParam String keyword 추가
      */
-    @GetMapping
+    @GetMapping("/v1/products")
     public ResponseEntity<ApiResponse<ProductListResponse>> getProducts(
             @RequestParam(required = false) String keyword,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         ProductListResponse productListResponse = productService.getProducts(pageable, keyword);
+
+        return ApiResponse.success(productListResponse, "상품 목록 조회에 성공했습니다.");
+    }
+
+    /**
+     * 상품 목록 페이징 조회 엔드포인트
+     *
+     * @param pageable 페이징 정보 (page, size, sort)
+     * @return 페이징된 상품 목록
+     * + RequestParam String keyword 추가
+     */
+    @GetMapping("/v2/products")
+    public ResponseEntity<ApiResponse<ProductListResponse>> getProductsV2(
+            @RequestParam(required = false) String keyword,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        ProductListResponse productListResponse = productService.getProductsV2(pageable, keyword);
 
         return ApiResponse.success(productListResponse, "상품 목록 조회에 성공했습니다.");
     }
@@ -71,7 +88,7 @@ public class ProductController {
      * @param request   상품 수정 요청 정보
      * @return 수정된 상품 정보
      */
-    @PutMapping("/{productId}")
+    @PutMapping("/v1/products/{productId}")
     public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(@PathVariable Long productId,
                                                                       @Valid @RequestBody ProductUpdateRequest request) {
         ProductResponse productResponse = productService.updateProduct(productId, request);
@@ -84,7 +101,7 @@ public class ProductController {
      *
      * @param productId 삭제할 상품 ID
      */
-    @DeleteMapping("/{productId}")
+    @DeleteMapping("/v1/products/{productId}")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long productId) {
         productService.deleteProduct(productId);
         return ApiResponse.success(null, "상품이 성공적으로 삭제되었습니다.");

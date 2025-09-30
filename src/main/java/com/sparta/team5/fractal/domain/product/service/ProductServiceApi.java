@@ -43,6 +43,6 @@ public interface ProductServiceApi {
 
     Page<Product> findProductsByCategoryId(Long categoryId, Pageable pageable);
 
-    ProductListResponse getProducts(Pageable pageable, String keyword);
+    ProductListResponse getProductsV2(Pageable pageable, String keyword);
 
 }

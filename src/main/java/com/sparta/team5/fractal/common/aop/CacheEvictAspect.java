@@ -5,10 +5,10 @@ import com.sparta.team5.fractal.common.exception.GlobalException;
 import com.sparta.team5.fractal.domain.product.dto.ProductListResponse;
 import com.sparta.team5.fractal.domain.product.service.ProductServiceApi;
 import com.sparta.team5.fractal.domain.search.service.SearchServiceApi;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.PageRequest;
@@ -21,24 +21,16 @@ import java.util.List;
 @Slf4j
 @Aspect
 @Component
+@RequiredArgsConstructor
 public class CacheEvictAspect {
 
     private final ProductServiceApi productServiceApi;
     private final SearchServiceApi searchServiceApi;
     private final CacheManager cacheManager;
 
-    public CacheEvictAspect(@Qualifier("productServiceV2") ProductServiceApi productServiceApi,
-                            SearchServiceApi searchServiceApi,
-                            CacheManager cacheManager
-    ) {
-        this.cacheManager = cacheManager;
-        this.productServiceApi = productServiceApi;
-        this.searchServiceApi = searchServiceApi;
-    }
-
-    @After("(execution(* com.sparta.team5.fractal.domain.product.service.ProductServiceV2.createProduct(..)) ||" +
-            "execution(* com.sparta.team5.fractal.domain.product.service.ProductServiceV2.updateProduct(..)) ||" +
-            "execution(* com.sparta.team5.fractal.domain.product.service.ProductServiceV2.deleteProduct(..)))")
+    @After("(execution(* com.sparta.team5.fractal.domain.product.service.ProductService.createProduct(..)) ||" +
+            "execution(* com.sparta.team5.fractal.domain.product.service.ProductService.updateProduct(..)) ||" +
+            "execution(* com.sparta.team5.fractal.domain.product.service.ProductService.deleteProduct(..)))")
     public void productCacheEvict() {
 
         Cache cache = cacheManager.getCache("products");
@@ -53,7 +45,7 @@ public class CacheEvictAspect {
 
         keywords.forEach(keyword -> {
             // 키워드로 조회 후
-            ProductListResponse products = productServiceApi.getProducts(pageable, keyword);
+            ProductListResponse products = productServiceApi.getProductsV2(pageable, keyword);
 
             // 캐시에 저장
             cache.put(keyword, products);
