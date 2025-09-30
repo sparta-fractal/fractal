@@ -3,20 +3,15 @@ package com.sparta.team5.fractal.domain.product.entity;
 import com.sparta.team5.fractal.common.entity.BaseEntity;
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.tag.entity.Tag;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "products")
@@ -59,14 +54,30 @@ public class Product extends BaseEntity {
         this.description = description;
     }
 
-    public void replaceTags(Set<Tag> tags) {
-        this.productTags.clear();
-        if (tags == null) {
+    public void replaceTags(Set<Tag> newTags) {
+        if (newTags == null) {
+            this.productTags.clear();
             return;
         }
-        for (Tag tag : tags) {
+
+        Set<Tag> currentTags = this.productTags.stream()
+                .map(ProductTag::getTag)
+                .collect(Collectors.toSet());
+
+        Set<Tag> toAdd = new HashSet<>(newTags);
+        toAdd.removeAll(currentTags);
+
+        for (Tag tag : toAdd) {
+            if (tag == null) {
+                throw new IllegalArgumentException("태그는 null일 수 없습니다.");
+            }
             this.productTags.add(ProductTag.of(this, tag));
         }
+
+        Set<Tag> toRemove = new HashSet<>(currentTags);
+        toRemove.removeAll(newTags);
+
+        this.productTags.removeIf(pt -> toRemove.contains(pt.getTag()));
     }
 
     public void addTag(Tag tag) {
@@ -87,14 +98,25 @@ public class Product extends BaseEntity {
         this.productTags.removeIf(pt -> pt.getTag().equals(tag));
     }
 
-    public void replaceCategories(Set<Category> categories) {
-        this.productCategories.clear();
-        if (categories == null) {
+    public void replaceCategories(Set<Category> newCategories) {
+        if (newCategories == null) {
+            this.productCategories.clear();
             return;
         }
-        for (Category category : categories) {
-            this.productCategories.add(ProductCategory.of(this, category));
-        }
+
+        Set<Category> currentCategories = this.productCategories.stream()
+                .map(ProductCategory::getCategory)
+                .collect(Collectors.toSet());
+
+        Set<Category> toAdd = new HashSet<>(newCategories);
+        toAdd.removeAll(currentCategories);
+
+        Set<Category> toRemove = new HashSet<>(currentCategories);
+        toRemove.removeAll(newCategories);
+
+        toAdd.forEach(category -> this.productCategories.add(ProductCategory.of(this, category)));
+
+        this.productCategories.removeIf(pc -> toRemove.contains(pc.getCategory()));
     }
 
     public void addCategory(Category category) {
