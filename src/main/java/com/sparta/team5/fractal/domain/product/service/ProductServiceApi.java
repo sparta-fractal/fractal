@@ -1,5 +1,6 @@
 package com.sparta.team5.fractal.domain.product.service;
 
+import com.sparta.team5.fractal.domain.product.dto.ProductListResponse;
 import com.sparta.team5.fractal.domain.product.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
