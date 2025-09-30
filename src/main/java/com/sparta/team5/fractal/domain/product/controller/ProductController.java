@@ -48,7 +48,7 @@ public class ProductController {
     }
 
     /**
-     * 상품 목록 페이징 조회 엔드포인트
+     * 상품 목록 페이징 조회 엔드포인트 v1
      *
      * @param pageable 페이징 정보 (page, size, sort)
      * @return 페이징된 상품 목록
@@ -65,7 +65,7 @@ public class ProductController {
     }
 
     /**
-     * 상품 목록 페이징 조회 엔드포인트
+     * 상품 목록 페이징 조회 엔드포인트 v2
      *
      * @param pageable 페이징 정보 (page, size, sort)
      * @return 페이징된 상품 목록

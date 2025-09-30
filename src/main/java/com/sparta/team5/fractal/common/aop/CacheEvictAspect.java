@@ -40,7 +40,7 @@ public class CacheEvictAspect {
         cache.clear();
 
         List<String> keywords = searchServiceApi.getTopTenKeywords();
-        // 이 부분 애매함
+        
         Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         keywords.forEach(keyword -> {
