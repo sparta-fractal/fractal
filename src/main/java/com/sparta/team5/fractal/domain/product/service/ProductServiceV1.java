@@ -31,7 +31,6 @@ public class ProductServiceV1 implements ProductServiceApi {
     private final SearchServiceApi searchServiceApi;
     private final TagServiceApi tagServiceApi;
     private final CategoryServiceApi categoryServiceApi;
-
     private final ProductRepository productRepository;
 
     public ProductResponse createProduct(ProductCreateRequest request) {

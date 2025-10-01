@@ -13,14 +13,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CacheEvictAspect {
 
-    private final ProductCacheService cacheEvictService;
+    private final ProductCacheService productCacheService;
 
     @After("(execution(* com.sparta.team5.fractal.domain.product.service.ProductServiceV1.createProduct(..)) ||" +
             "execution(* com.sparta.team5.fractal.domain.product.service.ProductServiceV1.updateProduct(..)) ||" +
             "execution(* com.sparta.team5.fractal.domain.product.service.ProductServiceV1.deleteProduct(..)))")
     public void productCacheEvict() {
 
-        cacheEvictService.refreshTopKeywordProductCache();
+        productCacheService.refreshTopKeywordProductCache();
     }
 }
 

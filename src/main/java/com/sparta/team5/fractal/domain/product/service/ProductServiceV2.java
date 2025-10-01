@@ -35,11 +35,9 @@ import java.util.stream.Collectors;
 public class ProductServiceV2 {
 
     private final CacheUtil cacheUtil;
-
     private final SearchServiceApi searchServiceApi;
     private final TagServiceApi tagServiceApi;
     private final CategoryServiceApi categoryServiceApi;
-
     private final ProductRepository productRepository;
 
     @Caching(evict = {

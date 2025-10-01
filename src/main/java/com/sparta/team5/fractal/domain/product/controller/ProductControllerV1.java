@@ -74,8 +74,7 @@ public class ProductControllerV1 {
      * @return 수정된 상품 정보
      */
     @PutMapping("/{productId}")
-    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(@PathVariable Long productId,
-                                                                      @Valid @RequestBody ProductUpdateRequest request) {
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(@PathVariable Long productId, @Valid @RequestBody ProductUpdateRequest request) {
 
         ProductResponse productResponse = productServiceV1.updateProduct(productId, request);
 

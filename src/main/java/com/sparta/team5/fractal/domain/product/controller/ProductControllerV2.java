@@ -28,8 +28,7 @@ public class ProductControllerV2 {
      * @return 생성된 상품 정보와 성공 메시지
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
-            @Valid @RequestBody ProductCreateRequest request) {
+    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(@Valid @RequestBody ProductCreateRequest request) {
 
         ProductResponse productResponse = productServiceV2.createProduct(request);
 
@@ -60,8 +59,7 @@ public class ProductControllerV2 {
      * @return 수정된 상품 정보와 성공 메시지
      */
     @PutMapping("/{productId}")
-    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(@PathVariable Long productId,
-                                                                      @Valid @RequestBody ProductUpdateRequest request) {
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(@PathVariable Long productId, @Valid @RequestBody ProductUpdateRequest request) {
 
         ProductResponse productResponse = productServiceV2.updateProduct(productId, request);
 
