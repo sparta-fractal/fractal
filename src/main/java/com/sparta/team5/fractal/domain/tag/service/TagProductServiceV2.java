@@ -1,6 +1,8 @@
 package com.sparta.team5.fractal.domain.tag.service;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -25,12 +27,30 @@ public class TagProductServiceV2 {
 	private final TagServiceApi tagServiceApi;
 	private final CacheManager cacheManager;
 	private final TagCacheService tagCacheService;
+	
+	// 사용자별 태그 조회 기록을 관리하는 메모리 캐시
+	// Key: userId, Value: 조회한 tagId들의 Set
+	private final ConcurrentHashMap<Long, Set<Long>> userTagViewHistory = new ConcurrentHashMap<>();
 
-	// 캐싱을 적용할 메서드
+	/**
+	 * 사용자별 태그 조회 (어뷰징 방지)
+	 * 동일한 사용자가 같은 태그를 여러 번 조회해도 조회수는 한 번만 증가한다
+	 *
+	 * @param tagId 조회할 태그 ID
+	 * @param userId 조회한 사용자 ID
+	 * @param pageable 페이징 정보
+	 * @return 태그 상세 정보와 관련 상품 목록
+	 */
 	@Transactional
-	public TagProductResponse getTag(Long tagId, Pageable pageable) {
+	public TagProductResponse getTag(Long tagId, Long userId, Pageable pageable) {
+		Tag tag = tagServiceApi.findById(tagId)
+			.orElseThrow(() -> new GlobalException(TagErrorCode.TAG_NOT_FOUND));
 
-		Tag tag = findById(tagId);
+		// 사용자별 조회 기록 확인 및 조회수 증가
+		if (isFirstTimeViewing(tagId, userId)) {
+			increaseCacheViewCount(tagId);
+			recordUserView(tagId, userId);
+		}
 
 		Page<ProductSimpleResponse> productDtoPage = tagCacheService.findProductsByTagId(tagId, pageable);
 
@@ -97,6 +117,26 @@ public class TagProductServiceV2 {
 		}
 	}
 
-	// 해당 사용자가 태그를 조회할 때마다 조회수를 증가시키지 않도록 하는 메서드
-	// public
+	/**
+	 * 사용자가 특정 태그를 처음 조회하는지 확인
+	 *
+	 * @param tagId 태그 ID
+	 * @param userId 사용자 ID
+	 * @return 처음 조회하는 경우 true, 이미 조회한 경우 false
+	 */
+	private boolean isFirstTimeViewing(Long tagId, Long userId) {
+		Set<Long> userViewedTags = userTagViewHistory.get(userId);
+		return userViewedTags == null || !userViewedTags.contains(tagId);
+	}
+
+	/**
+	 * 사용자의 태그 조회 기록을 기록
+	 *
+	 * @param tagId 태그 ID
+	 * @param userId 사용자 ID
+	 */
+	private void recordUserView(Long tagId, Long userId) {
+		userTagViewHistory.computeIfAbsent(userId, k -> ConcurrentHashMap.newKeySet())
+			.add(tagId);
+	}
 }
