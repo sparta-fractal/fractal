@@ -2,14 +2,15 @@ package com.sparta.team5.fractal.domain.product.entity;
 
 import com.sparta.team5.fractal.domain.tag.entity.Tag;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "product_tag",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "tag_id"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "tag_id"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class ProductTag {
@@ -39,5 +40,3 @@ public class ProductTag {
         return new ProductTag(product, tag);
     }
 }
-
-

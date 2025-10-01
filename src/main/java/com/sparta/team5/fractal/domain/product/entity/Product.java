@@ -26,7 +26,7 @@ public class Product extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String title;
 
-    @Column(nullable = false, precision = 19, scale = 2)
+    @Column(nullable = false, precision = 19)
     private BigDecimal price;
 
     @Column(nullable = false, length = 1000)

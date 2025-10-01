@@ -29,6 +29,7 @@ public class ProductController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<ProductResponse>> createProduct(@Valid @RequestBody ProductCreateRequest request) {
+
         ProductResponse productResponse = productService.createProduct(request);
 
         return ApiResponse.created(productResponse, "상품이 성공적으로 생성되었습니다.");
@@ -42,24 +43,25 @@ public class ProductController {
      */
     @GetMapping("/{productId}")
     public ResponseEntity<ApiResponse<ProductResponse>> getProduct(@PathVariable Long productId) {
+
         ProductResponse productResponse = productService.getProduct(productId);
 
         return ApiResponse.success(productResponse, "상품 조회에 성공했습니다.");
     }
 
     /**
-     * 상품 목록 페이징 조회 엔드포인트 v1
+     * 검색어를 통한 상품 목록 페이징 조회 엔드포인트 v1
      *
+     * @param keyword  검색할 상품의 제목 또는 내용
      * @param pageable 페이징 정보 (page, size, sort)
      * @return 페이징된 상품 목록
-     * + RequestParam String keyword 추가
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<ProductListResponse>> getProducts(
+    public ResponseEntity<ApiResponse<ProductListResponse>> getProductsByKeyword(
             @RequestParam(required = false) String keyword,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        ProductListResponse productListResponse = productService.getProducts(pageable, keyword);
+        ProductListResponse productListResponse = productService.getProductsByKeyword(pageable, keyword);
 
         return ApiResponse.success(productListResponse, "상품 목록 조회에 성공했습니다.");
     }
@@ -71,9 +73,11 @@ public class ProductController {
      * @param request   상품 수정 요청 정보
      * @return 수정된 상품 정보
      */
+
     @PutMapping("/{productId}")
     public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(@PathVariable Long productId,
                                                                       @Valid @RequestBody ProductUpdateRequest request) {
+
         ProductResponse productResponse = productService.updateProduct(productId, request);
 
         return ApiResponse.success(productResponse, "상품이 성공적으로 수정되었습니다.");
@@ -86,7 +90,9 @@ public class ProductController {
      */
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long productId) {
+
         productService.deleteProduct(productId);
+
         return ApiResponse.success(null, "상품이 성공적으로 삭제되었습니다.");
     }
 }

@@ -30,13 +30,13 @@ import java.util.stream.Collectors;
 @Transactional
 public class ProductService implements ProductServiceApi {
 
-    private final ProductRepository productRepository;
     private final SearchServiceApi searchServiceApi;
     private final TagServiceApi tagServiceApi;
     private final CategoryServiceApi categoryServiceApi;
 
+    private final ProductRepository productRepository;
+
     public ProductResponse createProduct(ProductCreateRequest request) {
-        Set<Category> categories = processCategories(request.categoryIds());
 
         Product product = Product.of(
                 request.title(),
@@ -44,6 +44,7 @@ public class ProductService implements ProductServiceApi {
                 request.description()
         );
 
+        Set<Category> categories = processCategories(request.categoryIds());
         product.replaceCategories(categories);
 
         Set<Tag> tags = processTags(request.tags());
@@ -51,49 +52,25 @@ public class ProductService implements ProductServiceApi {
 
         Product savedProduct = productRepository.save(product);
 
-        return ProductResponse.from(savedProduct);
+        ProductResponse response = ProductResponse.from(savedProduct);
+
+        return response;
     }
 
     @Transactional(readOnly = true)
     public ProductResponse getProduct(Long productId) {
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
-        return ProductResponse.from(product);
-    }
+        ProductResponse response = ProductResponse.from(product);
 
-    // ProductServiceApi 구현 메서드들
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Product> findById(Long productId) {
-        return productRepository.findById(productId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean existsById(Long productId) {
-        return productRepository.existsById(productId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Product> findAll(Pageable pageable) {
-        return productRepository.findAll(pageable);
-    }
-
-    @Override
-    public Page<Product> findProductsByTagId(Long tagId, Pageable pageable) {
-        return productRepository.findProductsByTagId(tagId, pageable);
-    }
-
-    @Override
-    public Page<Product> findProductsByCategoryId(Long categoryId, Pageable pageable) {
-        return productRepository.findProductsByCategoryId(categoryId, pageable);
+        return response;
     }
 
     // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회 v1
     @Transactional
-    public ProductListResponse getProducts(Pageable pageable, String keyword) {
+    public ProductListResponse getProductsByKeyword(Pageable pageable, String keyword) {
 
         Page<Product> productPage = productRepository.findAllByKeyword(pageable, keyword);
 
@@ -101,14 +78,15 @@ public class ProductService implements ProductServiceApi {
             searchServiceApi.createSearch(keyword);
         }
 
-        return ProductListResponse.from(productPage);
+        ProductListResponse response = ProductListResponse.from(productPage);
+
+        return response;
     }
 
     public ProductResponse updateProduct(Long productId, ProductUpdateRequest request) {
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
-
-        Set<Category> categories = processCategories(request.categoryIds());
 
         product.update(
                 request.title(),
@@ -116,6 +94,7 @@ public class ProductService implements ProductServiceApi {
                 request.description()
         );
 
+        Set<Category> categories = processCategories(request.categoryIds());
         product.replaceCategories(categories);
 
         Set<Tag> tags = processTags(request.tags());
@@ -123,39 +102,76 @@ public class ProductService implements ProductServiceApi {
 
         Product updatedProduct = productRepository.save(product);
 
-        return ProductResponse.from(updatedProduct);
-    }
+        ProductResponse response = ProductResponse.from(updatedProduct);
 
-    private Set<Category> processCategories(List<Long> categoryIds) {
-        if (categoryIds == null || categoryIds.isEmpty()) {
-            return Collections.emptySet();
-        }
-
-        return categoryIds.stream()
-                .map(categoryId -> categoryServiceApi.findById(categoryId)
-                        .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND)))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
-    private Set<Tag> processTags(List<String> tagNames) {
-        if (tagNames == null || tagNames.isEmpty()) {
-            return Collections.emptySet();
-        }
-
-        return tagNames.stream()
-                .map(name -> name == null ? "" : name.trim())
-                .filter(s -> !s.isEmpty())
-                .map(name -> tagServiceApi.findByName(name)
-                        .orElseGet(() -> tagServiceApi.createTag(name)))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+        return response;
     }
 
     public void deleteProduct(Long productId) {
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
         product.delete();
 
         productRepository.save(product);
+    }
+
+    // 헬퍼 메서드
+    private Set<Category> processCategories(List<Long> categoryIds) {
+
+        if (categoryIds == null || categoryIds.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        Set<Category> categories = categoryIds.stream()
+                .map(categoryId -> categoryServiceApi.findById(categoryId)
+                        .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND)))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        return categories;
+    }
+
+    private Set<Tag> processTags(List<String> tagNames) {
+
+        if (tagNames == null || tagNames.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        Set<Tag> tags = tagNames.stream()
+                .map(name -> name == null ? "" : name.trim())
+                .filter(s -> !s.isEmpty())
+                .map(name -> tagServiceApi.findByName(name)
+                        .orElseGet(() -> tagServiceApi.createTag(name)))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        return tags;
+    }
+
+    // ProductServiceApi 구현 메서드
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Product> findById(Long productId) {
+
+        Optional<Product> product = productRepository.findById(productId);
+
+        return product;
+    }
+
+    // 타도메인에서 사용하는 메서드
+    @Override
+    public Page<Product> findProductsByTagId(Long tagId, Pageable pageable) {
+
+        Page<Product> products = productRepository.findProductsByTagId(tagId, pageable);
+
+        return products;
+    }
+
+    @Override
+    public Page<Product> findProductsByCategoryId(Long categoryId, Pageable pageable) {
+
+        Page<Product> products = productRepository.findProductsByCategoryId(categoryId, pageable);
+
+        return products;
     }
 }
