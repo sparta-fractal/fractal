@@ -1,9 +1,6 @@
-package com.sparta.team5.fractal.common.config;
+package com.sparta.team5.fractal.common.config.cache;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import java.util.concurrent.TimeUnit;
-import java.time.Duration;
-
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCache;
@@ -11,31 +8,33 @@ import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableCaching
 public class CacheConfig {
 
-	@Bean
-	public CacheManager cacheManager() {
+    @Bean
+    public CacheManager cacheManager() {
         // 아래와 같이 자신이 사용할 캐시 추가, 설정
         CaffeineCache products = new CaffeineCache("products",
                 Caffeine.newBuilder()
                         .maximumSize(10_000)
                         .build());
 
-		CaffeineCache tagViewCountCache = new CaffeineCache("tagViewCountCache",
-			Caffeine.newBuilder()
-				.expireAfterWrite(Duration.ofHours(24))
-				.maximumSize(2000) // 캐시 최대 크기
-				.build());
+        CaffeineCache tagViewCountCache = new CaffeineCache("tagViewCountCache",
+                Caffeine.newBuilder()
+                        .expireAfterWrite(Duration.ofHours(24))
+                        .maximumSize(2000) // 캐시 최대 크기
+                        .build());
 
-		CaffeineCache productListCache = new CaffeineCache("productListCache",
-			Caffeine.newBuilder()
-				.expireAfterWrite(Duration.ofHours(24))
-				.maximumSize(2000) // 캐시 최대 크기
-				.build());
+        CaffeineCache productListCache = new CaffeineCache("productListCache",
+                Caffeine.newBuilder()
+                        .expireAfterWrite(Duration.ofHours(24))
+                        .maximumSize(2000) // 캐시 최대 크기
+                        .build());
 
         CaffeineCache categoryProducts = new CaffeineCache("categoryProducts",
                 Caffeine.newBuilder()

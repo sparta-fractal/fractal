@@ -1,5 +1,6 @@
-package com.sparta.team5.fractal.common.config;
+package com.sparta.team5.fractal.common.config.web;
 
+import com.sparta.team5.fractal.common.config.security.AuthUserArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

@@ -1,5 +1,7 @@
-package com.sparta.team5.fractal.common.config;
+package com.sparta.team5.fractal.common.config.web;
 
+import com.sparta.team5.fractal.common.config.security.JwtFilter;
+import com.sparta.team5.fractal.common.config.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

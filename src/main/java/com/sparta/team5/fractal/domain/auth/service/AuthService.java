@@ -1,7 +1,7 @@
 package com.sparta.team5.fractal.domain.auth.service;
 
-import com.sparta.team5.fractal.common.config.JwtUtil;
-import com.sparta.team5.fractal.common.config.PasswordEncoder;
+import com.sparta.team5.fractal.common.config.security.JwtUtil;
+import com.sparta.team5.fractal.common.config.security.PasswordEncoder;
 import com.sparta.team5.fractal.common.dto.AuthUser;
 import com.sparta.team5.fractal.common.exception.GlobalException;
 import com.sparta.team5.fractal.domain.auth.dto.request.AuthLoginRequest;

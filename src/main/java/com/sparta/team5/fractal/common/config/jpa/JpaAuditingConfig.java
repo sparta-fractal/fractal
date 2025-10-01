@@ -1,4 +1,4 @@
-package com.sparta.team5.fractal.common.config;
+package com.sparta.team5.fractal.common.config.jpa;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;

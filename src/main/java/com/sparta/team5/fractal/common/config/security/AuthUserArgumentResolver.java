@@ -1,4 +1,4 @@
-package com.sparta.team5.fractal.common.config;
+package com.sparta.team5.fractal.common.config.security;
 
 import com.sparta.team5.fractal.common.annotation.Auth;
 import com.sparta.team5.fractal.common.dto.AuthUser;
