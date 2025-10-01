@@ -6,30 +6,21 @@ import com.sparta.team5.fractal.domain.category.dto.CategoryResponse;
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
 import com.sparta.team5.fractal.domain.category.repository.CategoryRepository;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class CategoryService implements CategoryServiceApi {
-
+public class CategoryServiceV2 {
     private final CategoryRepository categoryRepository;
-
-    @Transactional(readOnly = true)
-    public List<CategoryResponse> getAllCategories() {
-
-        List<Category> categories = categoryRepository.findAll();
-
-        return categories.stream()
-                .map(CategoryResponse::from)
-                .toList();
-    }
 
     @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest request) {
+
         // 중복 카테고리명 체크
         if (categoryRepository.existsByName(request.name())) {
             throw new GlobalException(CategoryErrorCode.CATEGORY_NAME_DUPLICATED);
@@ -49,6 +40,7 @@ public class CategoryService implements CategoryServiceApi {
     }
 
     @Transactional
+    @CacheEvict(value = "categoryProducts", allEntries = true)
     public CategoryResponse updateCategory(Long categoryId, CategoryCreateRequest request) {
 
         Category category = categoryRepository.findById(categoryId)
@@ -73,6 +65,7 @@ public class CategoryService implements CategoryServiceApi {
     }
 
     @Transactional
+    @CacheEvict(value = "categoryProducts", allEntries = true)
     public void deleteCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
@@ -82,12 +75,5 @@ public class CategoryService implements CategoryServiceApi {
         categoryRepository.save(category);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Category> findById(Long Id) {
-        return categoryRepository.findById(Id);
-    }
 
 }
-
-

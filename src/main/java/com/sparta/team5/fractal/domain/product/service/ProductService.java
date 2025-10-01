@@ -27,9 +27,15 @@ import com.sparta.team5.fractal.domain.product.repository.ProductRepository;
 import com.sparta.team5.fractal.domain.search.service.SearchServiceApi;
 import com.sparta.team5.fractal.domain.tag.entity.Tag;
 import com.sparta.team5.fractal.domain.tag.service.TagServiceApi;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -99,9 +105,9 @@ public class ProductService implements ProductServiceApi {
 		return productRepository.findProductsByCategoryId(categoryId, pageable);
 	}
 
-	// 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회
-	@Transactional
-	public ProductListResponse getProducts(Pageable pageable, String keyword) {
+    // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회 v1
+    @Transactional
+    public ProductListResponse getProducts(Pageable pageable, String keyword) {
 
 		Page<Product> productPage = productRepository.findAllByKeyword(pageable, keyword);
 

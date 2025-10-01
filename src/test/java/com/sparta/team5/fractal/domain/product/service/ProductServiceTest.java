@@ -1,5 +1,6 @@
 // package com.sparta.team5.fractal.domain.product.service;
 //
+// import com.sparta.team5.fractal.common.exception.GlobalException;
 // import com.sparta.team5.fractal.domain.category.entity.Category;
 // import com.sparta.team5.fractal.domain.category.repository.CategoryRepository;
 // import com.sparta.team5.fractal.domain.category.service.CategoryServiceApi;
@@ -11,23 +12,19 @@
 // import com.sparta.team5.fractal.domain.tag.entity.Tag;
 // import com.sparta.team5.fractal.domain.tag.repository.TagRepository;
 // import com.sparta.team5.fractal.domain.tag.service.TagServiceApi;
-// import com.sparta.team5.fractal.common.exception.GlobalException;
 // import org.junit.jupiter.api.DisplayName;
 // import org.junit.jupiter.api.Test;
 // import org.junit.jupiter.api.extension.ExtendWith;
 // import org.mockito.InjectMocks;
 // import org.mockito.Mock;
 // import org.mockito.junit.jupiter.MockitoExtension;
-// import org.springframework.data.domain.Page;
-// import org.springframework.data.domain.PageImpl;
-// import org.springframework.data.domain.PageRequest;
-// import org.springframework.data.domain.Pageable;
 //
 // import java.math.BigDecimal;
 // import java.util.List;
 // import java.util.Optional;
 //
-// import static org.assertj.core.api.Assertions.*;
+// import static org.assertj.core.api.Assertions.assertThat;
+// import static org.assertj.core.api.Assertions.assertThatThrownBy;
 // import static org.mockito.ArgumentMatchers.any;
 // import static org.mockito.Mockito.*;
 //
@@ -57,11 +54,11 @@
 //     void createProduct_Success() {
 //         // given
 //         ProductCreateRequest request = new ProductCreateRequest(
-//             "갤럭시 워치 4",
-//             BigDecimal.valueOf(100000),
-//             "최신형 전자기기",
-//             List.of(1L, 2L),
-//             List.of("시계", "트랜디")
+//                 "갤럭시 워치 4",
+//                 BigDecimal.valueOf(100000),
+//                 "최신형 전자기기",
+//                 List.of(1L, 2L),
+//                 List.of("시계", "트랜디")
 //         );
 //
 //         Category category1 = Category.of("전자제품", null);
@@ -96,11 +93,11 @@
 //     void createProduct_CategoryNotFound() {
 //         // given
 //         ProductCreateRequest request = new ProductCreateRequest(
-//             "갤럭시 워치 4",
-//             BigDecimal.valueOf(100000),
-//             "최신형 전자기기",
-//             List.of(999L),
-//             List.of("시계")
+//                 "갤럭시 워치 4",
+//                 BigDecimal.valueOf(100000),
+//                 "최신형 전자기기",
+//                 List.of(999L),
+//                 List.of("시계")
 //         );
 //
 //         when(categoryServiceApi.findById(999L)).thenReturn(Optional.empty());
@@ -150,28 +147,28 @@
 //         verify(productRepository).findById(productId);
 //     }
 //
-//     @Test
-//     @DisplayName("상품 목록 조회 성공")
-//     void getProducts_Success() {
-//         // given
-//         Pageable pageable = PageRequest.of(0, 20);
-//         Product product1 = Product.of("상품1", BigDecimal.valueOf(10000), "설명1");
-//         Product product2 = Product.of("상품2", BigDecimal.valueOf(20000), "설명2");
-//         Page<Product> productPage = new PageImpl<>(List.of(product1, product2), pageable, 2);
-//
-//         when(productRepository.findAll(pageable)).thenReturn(productPage);
-//
-//         // when
-//         var response = productService.getProducts(pageable);
-//
-//         // then
-//         assertThat(response).isNotNull();
-//         assertThat(response.products()).hasSize(2);
-//         assertThat(response.totalElements()).isEqualTo(2);
-//         assertThat(response.currentPage()).isEqualTo(1);
-//
-//         verify(productRepository).findAll(pageable);
-//     }
+// //    @Test
+// //    @DisplayName("상품 목록 조회 성공")
+// //    void getProducts_Success() {
+// //        // given
+// //        Pageable pageable = PageRequest.of(0, 20);
+// //        Product product1 = Product.of("상품1", BigDecimal.valueOf(10000), "설명1");
+// //        Product product2 = Product.of("상품2", BigDecimal.valueOf(20000), "설명2");
+// //        Page<Product> productPage = new PageImpl<>(List.of(product1, product2), pageable, 2);
+// //
+// //        when(productRepository.findAll(pageable)).thenReturn(productPage);
+// //
+// //        // when
+// //        var response = productService.getProductsV2(pageable);
+// //
+// //        // then
+// //        assertThat(response).isNotNull();
+// //        assertThat(response.products()).hasSize(2);
+// //        assertThat(response.totalElements()).isEqualTo(2);
+// //        assertThat(response.currentPage()).isEqualTo(1);
+// //
+// //        verify(productRepository).findAll(pageable);
+// //    }
 //
 //     @Test
 //     @DisplayName("상품 수정 성공")
@@ -179,11 +176,11 @@
 //         // given
 //         Long productId = 1L;
 //         ProductUpdateRequest request = new ProductUpdateRequest(
-//             "갤럭시 워치 5",
-//             BigDecimal.valueOf(120000),
-//             "업데이트된 설명",
-//             List.of(1L),
-//             List.of("시계", "최신")
+//                 "갤럭시 워치 5",
+//                 BigDecimal.valueOf(120000),
+//                 "업데이트된 설명",
+//                 List.of(1L),
+//                 List.of("시계", "최신")
 //         );
 //
 //         Product existingProduct = Product.of("갤럭시 워치 4", BigDecimal.valueOf(100000), "기존 설명");
@@ -215,11 +212,11 @@
 //         // given
 //         Long productId = 999L;
 //         ProductUpdateRequest request = new ProductUpdateRequest(
-//             "갤럭시 워치 5",
-//             BigDecimal.valueOf(120000),
-//             "업데이트된 설명",
-//             List.of(1L),
-//             List.of("시계")
+//                 "갤럭시 워치 5",
+//                 BigDecimal.valueOf(120000),
+//                 "업데이트된 설명",
+//                 List.of(1L),
+//                 List.of("시계")
 //         );
 //
 //         when(productRepository.findById(productId)).thenReturn(Optional.empty());

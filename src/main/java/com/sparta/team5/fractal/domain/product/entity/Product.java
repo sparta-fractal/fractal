@@ -21,6 +21,15 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "products")
@@ -63,50 +72,31 @@ public class Product extends BaseEntity {
 		this.description = description;
 	}
 
-	public void replaceTags(Set<Tag> tags) {
+    public void replaceTags(Set<Tag> newTags) {
+        if (newTags == null) {
+            this.productTags.clear();
+            return;
+        }
 
-		if (tags == null) {
-			return;
-		}
+        Set<Tag> currentTags = this.productTags.stream()
+                .map(ProductTag::getTag)
+                .collect(Collectors.toSet());
 
-		// 지울 태그들
-		List<ProductTag> removeTags = this.productTags.stream()
-			.filter(pt -> !tags.contains(pt.getTag()))
-			.toList();
+        Set<Tag> toAdd = new HashSet<>(newTags);
+        toAdd.removeAll(currentTags);
 
-		// 연관 관계 삭제 및 orphan removal 적용
-		for (ProductTag pt : removeTags) {
+        for (Tag tag : toAdd) {
+            if (tag == null) {
+                throw new IllegalArgumentException("태그는 null일 수 없습니다.");
+            }
+            this.productTags.add(ProductTag.of(this, tag));
+        }
 
-			pt.remove();
+        Set<Tag> toRemove = new HashSet<>(currentTags);
+        toRemove.removeAll(newTags);
 
-			this.productTags.remove(pt);
-		}
-
-		// 남은 태그
-		Set<Tag> existingTags = this.productTags.stream()
-			.map(ProductTag::getTag)
-			.collect(Collectors.toSet());
-
-		tags.stream()
-			.filter(tag -> !existingTags.contains(tag))
-			.forEach(tag -> this.productTags.add(ProductTag.of(this, tag)));
-
-		// List<Tag> oldTags = productTags.stream().map(ProductTag::getTag).toList();
-		//
-		// List<String> productTagsNames = productTags.stream().map(t -> t.getTag().getName()).toList();
-		// List<String> tagsNames = tags.stream().map(Tag::getName).toList();
-		//
-		// oldTags.removeIf(t -> !tagsNames.contains(t.getName()));
-		// tags.removeIf(t -> productTagsNames.contains(t.getName()));
-		//
-		// oldTags.addAll(tags);
-		//
-		// this.productTags.clear();
-		//
-		// for (Tag tag : oldTags) {
-		// 	this.productTags.add(ProductTag.of(this, tag));
-		// }
-	}
+        this.productTags.removeIf(pt -> toRemove.contains(pt.getTag()));
+    }
 
 	public void addTag(Tag tag) {
 		if (tag == null) {
@@ -126,15 +116,26 @@ public class Product extends BaseEntity {
 		this.productTags.removeIf(pt -> pt.getTag().equals(tag));
 	}
 
-	public void replaceCategories(Set<Category> categories) {
-		this.productCategories.clear();
-		if (categories == null) {
-			return;
-		}
-		for (Category category : categories) {
-			this.productCategories.add(ProductCategory.of(this, category));
-		}
-	}
+    public void replaceCategories(Set<Category> newCategories) {
+        if (newCategories == null) {
+            this.productCategories.clear();
+            return;
+        }
+
+        Set<Category> currentCategories = this.productCategories.stream()
+                .map(ProductCategory::getCategory)
+                .collect(Collectors.toSet());
+
+        Set<Category> toAdd = new HashSet<>(newCategories);
+        toAdd.removeAll(currentCategories);
+
+        Set<Category> toRemove = new HashSet<>(currentCategories);
+        toRemove.removeAll(newCategories);
+
+        toAdd.forEach(category -> this.productCategories.add(ProductCategory.of(this, category)));
+
+        this.productCategories.removeIf(pc -> toRemove.contains(pc.getCategory()));
+    }
 
 	public void addCategory(Category category) {
 		if (category == null) {

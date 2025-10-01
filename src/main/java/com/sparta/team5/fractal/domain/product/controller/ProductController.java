@@ -20,9 +20,13 @@ import com.sparta.team5.fractal.domain.product.dto.ProductListResponse;
 import com.sparta.team5.fractal.domain.product.dto.ProductResponse;
 import com.sparta.team5.fractal.domain.product.dto.ProductUpdateRequest;
 import com.sparta.team5.fractal.domain.product.service.ProductService;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -58,17 +62,17 @@ public class ProductController {
 		return ApiResponse.success(productResponse, "상품 조회에 성공했습니다.");
 	}
 
-	/**
-	 * 상품 목록 페이징 조회 엔드포인트
-	 *
-	 * @param pageable 페이징 정보 (page, size, sort)
-	 * @return 페이징된 상품 목록
-	 * + RequestParam String keyword 추가
-	 */
-	@GetMapping
-	public ResponseEntity<ApiResponse<ProductListResponse>> getProducts(
-		@RequestParam(required = false) String keyword,
-		@PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    /**
+     * 상품 목록 페이징 조회 엔드포인트 v1
+     *
+     * @param pageable 페이징 정보 (page, size, sort)
+     * @return 페이징된 상품 목록
+     * + RequestParam String keyword 추가
+     */
+    @GetMapping
+    public ResponseEntity<ApiResponse<ProductListResponse>> getProducts(
+            @RequestParam(required = false) String keyword,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
 		ProductListResponse productListResponse = productService.getProducts(pageable, keyword);
 

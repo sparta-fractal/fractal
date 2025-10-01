@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CommentService implements CommentServiceApi {
+
     private final CommentRepository commentRepository;
     private final UserServiceApi userService;
     private final ProductServiceApi productService;
