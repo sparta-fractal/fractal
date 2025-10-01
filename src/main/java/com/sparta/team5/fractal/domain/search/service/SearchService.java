@@ -17,7 +17,6 @@ public class SearchService implements SearchServiceApi {
 
     private final SearchRepository searchRepository;
 
-
     @Override
     public boolean existAndIncrease(String searchKeyword) {
 
