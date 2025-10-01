@@ -1,6 +1,6 @@
 package com.sparta.team5.fractal.common.aop;
 
-import com.sparta.team5.fractal.domain.product.service.CacheEvictService;
+import com.sparta.team5.fractal.domain.product.service.ProductCacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.After;
@@ -13,11 +13,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CacheEvictAspect {
 
-    private final CacheEvictService cacheEvictService;
+    private final ProductCacheService cacheEvictService;
 
-    @After("(execution(* com.sparta.team5.fractal.domain.product.service.ProductService.createProduct(..)) ||" +
-            "execution(* com.sparta.team5.fractal.domain.product.service.ProductService.updateProduct(..)) ||" +
-            "execution(* com.sparta.team5.fractal.domain.product.service.ProductService.deleteProduct(..)))")
+    @After("(execution(* com.sparta.team5.fractal.domain.product.service.ProductServiceV1.createProduct(..)) ||" +
+            "execution(* com.sparta.team5.fractal.domain.product.service.ProductServiceV1.updateProduct(..)) ||" +
+            "execution(* com.sparta.team5.fractal.domain.product.service.ProductServiceV1.deleteProduct(..)))")
     public void productCacheEvict() {
 
         cacheEvictService.refreshTopKeywordProductCache();

@@ -1,6 +1,5 @@
 package com.sparta.team5.fractal.domain.product.service;
 
-import com.sparta.team5.fractal.common.cache.CacheUtil;
 import com.sparta.team5.fractal.common.exception.GlobalException;
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
@@ -16,25 +15,18 @@ import com.sparta.team5.fractal.domain.search.service.SearchServiceApi;
 import com.sparta.team5.fractal.domain.tag.entity.Tag;
 import com.sparta.team5.fractal.domain.tag.service.TagServiceApi;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-@Service("productServiceV2")
+@Service
 @RequiredArgsConstructor
 @Transactional
-public class ProductServiceV2 {
-
-    private final CacheUtil cacheUtil;
+public class ProductServiceV1 implements ProductServiceApi {
 
     private final SearchServiceApi searchServiceApi;
     private final TagServiceApi tagServiceApi;
@@ -42,10 +34,6 @@ public class ProductServiceV2 {
 
     private final ProductRepository productRepository;
 
-    @Caching(evict = {
-            @CacheEvict(cacheNames = "categoryProducts", allEntries = true),
-            @CacheEvict(cacheNames = "productListCache", allEntries = true)
-    })
     public ProductResponse createProduct(ProductCreateRequest request) {
 
         Product product = Product.of(
@@ -68,36 +56,34 @@ public class ProductServiceV2 {
     }
 
     @Transactional(readOnly = true)
-    public ProductListResponse getProductsByKeywordV2(Pageable pageable, String keyword) {
+    public ProductResponse getProduct(Long productId) {
 
-        if (keyword != null) {
-            if (!searchServiceApi.existAndIncrease(keyword)) {
-                searchServiceApi.createSearch(keyword);
-            }
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
-            ProductListResponse productListResponse = cacheUtil.get("products", keyword, ProductListResponse.class);
-            if (productListResponse != null) {
+        ProductResponse response = ProductResponse.from(product);
 
-                return productListResponse;
-            }
-        }
+        return response;
+    }
+
+    @Transactional(readOnly = true)
+    public ProductListResponse getProductsByKeyword(Pageable pageable, String keyword) {
 
         Page<Product> productPage = productRepository.findAllByKeyword(pageable, keyword);
+
+        if (keyword != null && !searchServiceApi.existAndIncrease(keyword)) {
+            searchServiceApi.createSearch(keyword);
+        }
 
         ProductListResponse response = ProductListResponse.from(productPage);
 
         return response;
     }
 
-    @Caching(evict = {
-            @CacheEvict(value = "productListCache", allEntries = true),
-            @CacheEvict(cacheNames = {"categoryProducts"}, allEntries = true)
-    })
     public ProductResponse updateProduct(Long productId, ProductUpdateRequest request) {
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
-
-        Set<Category> categories = processCategories(request.categoryIds());
 
         product.update(
                 request.title(),
@@ -105,6 +91,7 @@ public class ProductServiceV2 {
                 request.description()
         );
 
+        Set<Category> categories = processCategories(request.categoryIds());
         product.replaceCategories(categories);
 
         Set<Tag> tags = processTags(request.tags());
@@ -117,11 +104,8 @@ public class ProductServiceV2 {
         return response;
     }
 
-    @Caching(evict = {
-            @CacheEvict(value = "productListCache", allEntries = true),
-            @CacheEvict(cacheNames = {"categoryProducts"}, allEntries = true)
-    })
     public void deleteProduct(Long productId) {
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
@@ -159,5 +143,31 @@ public class ProductServiceV2 {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
         return tags;
+    }
+
+    // ProductServiceApi 구현 메서드들
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Product> findById(Long productId) {
+
+        Optional<Product> product = productRepository.findById(productId);
+
+        return product;
+    }
+
+    @Override
+    public Page<Product> findProductsByTagId(Long tagId, Pageable pageable) {
+
+        Page<Product> products = productRepository.findProductsByTagId(tagId, pageable);
+
+        return products;
+    }
+
+    @Override
+    public Page<Product> findProductsByCategoryId(Long categoryId, Pageable pageable) {
+
+        Page<Product> products = productRepository.findProductsByCategoryId(categoryId, pageable);
+
+        return products;
     }
 }
