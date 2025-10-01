@@ -1,8 +1,8 @@
 # Fractal Cache API
 [![Java](https://img.shields.io/badge/Java-17-007396?style=flat&logo=java&logoColor=white)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?style=flat&logo=spring&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot 3.5.6](https://img.shields.io/badge/Spring%20Boot-3.5.6-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot) 
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=flat&logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![Gradle](https://img.shields.io/badge/Gradle-8.x-02303A?style=flat&logo=gradle&logoColor=white)](https://gradle.org/)
+![Gradle](https://img.shields.io/badge/Gradle-02303A?logo=gradle&logoColor=white)
 > 중고나라 관리 시스템 REST API 백엔드 개발 프로젝트
 <img width="1435" height="985" alt="image" src="https://github.com/user-attachments/assets/c46b28f9-e767-437a-922a-2051a5f5dcca" />
 
