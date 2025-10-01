@@ -1,6 +1,6 @@
 package com.sparta.team5.fractal.domain.auth.exception;
 
-import com.sparta.team5.fractal.common.exception.ErrorCode;
+import com.sparta.team5.fractal.common.core.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

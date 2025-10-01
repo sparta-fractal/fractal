@@ -1,7 +1,7 @@
 package com.sparta.team5.fractal.domain.user.service;
 
-import com.sparta.team5.fractal.common.config.security.PasswordEncoder;
-import com.sparta.team5.fractal.common.dto.AuthUser;
+import com.sparta.team5.fractal.common.core.dto.AuthUser;
+import com.sparta.team5.fractal.common.infra.security.PasswordEncoder;
 import com.sparta.team5.fractal.domain.user.dto.request.UpdatePasswordRequest;
 import com.sparta.team5.fractal.domain.user.dto.request.UpdateUserProfileRequest;
 import com.sparta.team5.fractal.domain.user.dto.response.UpdatePasswordResponse;

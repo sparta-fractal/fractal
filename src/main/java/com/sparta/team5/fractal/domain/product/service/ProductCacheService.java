@@ -1,6 +1,6 @@
 package com.sparta.team5.fractal.domain.product.service;
 
-import com.sparta.team5.fractal.common.cache.CacheUtil;
+import com.sparta.team5.fractal.common.infra.cache.CacheUtil;
 import com.sparta.team5.fractal.domain.product.dto.ProductListResponse;
 import com.sparta.team5.fractal.domain.search.service.SearchServiceApi;
 import lombok.RequiredArgsConstructor;
