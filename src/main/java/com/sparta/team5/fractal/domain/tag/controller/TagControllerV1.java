@@ -1,11 +1,9 @@
 package com.sparta.team5.fractal.domain.tag.controller;
 
-import com.sparta.team5.fractal.common.annotation.Auth;
-import com.sparta.team5.fractal.common.dto.AuthUser;
 import com.sparta.team5.fractal.common.response.ApiResponse;
 import com.sparta.team5.fractal.domain.tag.dto.response.TagProductResponse;
 import com.sparta.team5.fractal.domain.tag.dto.response.TagResponse;
-import com.sparta.team5.fractal.domain.tag.service.TagProductServiceV2;
+import com.sparta.team5.fractal.domain.tag.service.TagProductServiceV1;
 import com.sparta.team5.fractal.domain.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -21,11 +19,11 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/tags")
-public class TagControllerV2 {
+@RequestMapping("/api/v1/tags")
+public class TagControllerV1 {
 
     private final TagService tagService;
-    private final TagProductServiceV2 tagProductServiceV2;
+    private final TagProductServiceV1 tagProductServiceV1;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<TagResponse>>> getAllTags() {
@@ -35,19 +33,13 @@ public class TagControllerV2 {
         return ApiResponse.success(tags, "태그 목록을 성공적으로 조회하였습니다.");
     }
 
-    /**
-     * 인증된 사용자용 태그 조회 (어뷰징 방지 기능 적용)
-     * 동일한 사용자가 같은 태그를 여러 번 조회해도 조회수는 한 번만 증가한다
-     */
     @GetMapping("/{tagId}")
     public ResponseEntity<ApiResponse<TagProductResponse>> getProductsByTagId(
             @PathVariable Long tagId,
-            @PageableDefault(size = 30, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-            @Auth AuthUser authUser) {
+            @PageableDefault(size = 30, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        // 인증된 사용자의 경우 어뷰징 방지 기능 적용
-        TagProductResponse tags = tagProductServiceV2.getProductsByTagId(tagId, authUser.id(), pageable);
+        TagProductResponse tags = tagProductServiceV1.getProductsByTagId(tagId, pageable);
 
-        return ApiResponse.success(tags, "태그를 조회하였습니다.");
+        return ApiResponse.success(tags, "해당 태그가 적용된 게시글을 조회하였습니다.");
     }
 }
