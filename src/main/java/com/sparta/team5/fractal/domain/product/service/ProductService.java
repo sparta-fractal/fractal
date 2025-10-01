@@ -1,5 +1,18 @@
 package com.sparta.team5.fractal.domain.product.service;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.sparta.team5.fractal.common.exception.GlobalException;
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
@@ -30,132 +43,135 @@ import java.util.stream.Collectors;
 @Transactional
 public class ProductService implements ProductServiceApi {
 
-    private final ProductRepository productRepository;
-    private final SearchServiceApi searchServiceApi;
-    private final TagServiceApi tagServiceApi;
-    private final CategoryServiceApi categoryServiceApi;
+	private final ProductRepository productRepository;
+	private final SearchServiceApi searchServiceApi;
+	private final TagServiceApi tagServiceApi;
+	private final CategoryServiceApi categoryServiceApi;
 
-    public ProductResponse createProduct(ProductCreateRequest request) {
-        Set<Category> categories = processCategories(request.categoryIds());
+	@CacheEvict(value = "productListCache", allEntries = true)
+	public ProductResponse createProduct(ProductCreateRequest request) {
+		Set<Category> categories = processCategories(request.categoryIds());
 
-        Product product = Product.of(
-                request.title(),
-                request.price(),
-                request.description()
-        );
+		Product product = Product.of(
+			request.title(),
+			request.price(),
+			request.description()
+		);
 
-        product.replaceCategories(categories);
+		product.replaceCategories(categories);
 
-        Set<Tag> tags = processTags(request.tags());
-        product.replaceTags(tags);
+		Set<Tag> tags = processTags(request.tags());
+		product.replaceTags(tags);
 
-        Product savedProduct = productRepository.save(product);
+		Product savedProduct = productRepository.save(product);
 
-        return ProductResponse.from(savedProduct);
-    }
+		return ProductResponse.from(savedProduct);
+	}
 
-    @Transactional(readOnly = true)
-    public ProductResponse getProduct(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
+	@Transactional(readOnly = true)
+	public ProductResponse getProduct(Long productId) {
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
-        return ProductResponse.from(product);
-    }
+		return ProductResponse.from(product);
+	}
 
-    // ProductServiceApi 구현 메서드들
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Product> findById(Long productId) {
-        return productRepository.findById(productId);
-    }
+	// ProductServiceApi 구현 메서드들
+	@Override
+	@Transactional(readOnly = true)
+	public Optional<Product> findById(Long productId) {
+		return productRepository.findById(productId);
+	}
 
-    @Override
-    @Transactional(readOnly = true)
-    public boolean existsById(Long productId) {
-        return productRepository.existsById(productId);
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public boolean existsById(Long productId) {
+		return productRepository.existsById(productId);
+	}
 
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Product> findAll(Pageable pageable) {
-        return productRepository.findAll(pageable);
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public Page<Product> findAll(Pageable pageable) {
+		return productRepository.findAll(pageable);
+	}
 
-    @Override
-    public Page<Product> findProductsByTagId(Long tagId, Pageable pageable) {
-        return productRepository.findProductsByTagId(tagId, pageable);
-    }
+	@Override
+	public Page<Product> findProductsByTagId(Long tagId, Pageable pageable) {
+		return productRepository.findProductsByTagId(tagId, pageable);
+	}
 
-    @Override
-    public Page<Product> findProductsByCategoryId(Long categoryId, Pageable pageable) {
-        return productRepository.findProductsByCategoryId(categoryId, pageable);
-    }
+	@Override
+	public Page<Product> findProductsByCategoryId(Long categoryId, Pageable pageable) {
+		return productRepository.findProductsByCategoryId(categoryId, pageable);
+	}
 
     // 제품 전체 조회와 검색 시 keyword에 맞춰 해당 제품 제목을 조회 v1
     @Transactional
     public ProductListResponse getProducts(Pageable pageable, String keyword) {
 
-        Page<Product> productPage = productRepository.findAllByKeyword(pageable, keyword);
+		Page<Product> productPage = productRepository.findAllByKeyword(pageable, keyword);
 
-        if (keyword != null && !searchServiceApi.existAndIncrease(keyword)) {
-            searchServiceApi.createSearch(keyword);
-        }
+		if (keyword != null && !searchServiceApi.existAndIncrease(keyword)) {
+			searchServiceApi.createSearch(keyword);
+		}
 
-        return ProductListResponse.from(productPage);
-    }
+		return ProductListResponse.from(productPage);
+	}
 
-    public ProductResponse updateProduct(Long productId, ProductUpdateRequest request) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
+	@CacheEvict(value = "productListCache", allEntries = true)
+	public ProductResponse updateProduct(Long productId, ProductUpdateRequest request) {
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
-        Set<Category> categories = processCategories(request.categoryIds());
+		Set<Category> categories = processCategories(request.categoryIds());
 
-        product.update(
-                request.title(),
-                request.price(),
-                request.description()
-        );
+		product.update(
+			request.title(),
+			request.price(),
+			request.description()
+		);
 
-        product.replaceCategories(categories);
+		product.replaceCategories(categories);
 
-        Set<Tag> tags = processTags(request.tags());
-        product.replaceTags(tags);
+		Set<Tag> tags = processTags(request.tags());
+		product.replaceTags(tags);
 
-        Product updatedProduct = productRepository.save(product);
+		Product updatedProduct = productRepository.save(product);
 
-        return ProductResponse.from(updatedProduct);
-    }
+		return ProductResponse.from(updatedProduct);
+	}
 
-    private Set<Category> processCategories(List<Long> categoryIds) {
-        if (categoryIds == null || categoryIds.isEmpty()) {
-            return Collections.emptySet();
-        }
+	private Set<Category> processCategories(List<Long> categoryIds) {
+		if (categoryIds == null || categoryIds.isEmpty()) {
+			return Collections.emptySet();
+		}
 
-        return categoryIds.stream()
-                .map(categoryId -> categoryServiceApi.findById(categoryId)
-                        .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND)))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
+		return categoryIds.stream()
+			.map(categoryId -> categoryServiceApi.findById(categoryId)
+				.orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND)))
+			.collect(Collectors.toCollection(LinkedHashSet::new));
+	}
 
-    private Set<Tag> processTags(List<String> tagNames) {
-        if (tagNames == null || tagNames.isEmpty()) {
-            return Collections.emptySet();
-        }
+	private Set<Tag> processTags(List<String> tagNames) {
+		if (tagNames == null || tagNames.isEmpty()) {
+			return Collections.emptySet();
+		}
 
-        return tagNames.stream()
-                .map(name -> name == null ? "" : name.trim())
-                .filter(s -> !s.isEmpty())
-                .map(name -> tagServiceApi.findByName(name)
-                        .orElseGet(() -> tagServiceApi.createTag(name)))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
+		return tagNames.stream()
+			.map(name -> name == null ? "" : name.trim())
+			.filter(s -> !s.isEmpty())
+			.map(name -> tagServiceApi.findByName(name)
+				.orElseGet(() -> tagServiceApi.createTag(name)))
+			.collect(Collectors.toCollection(LinkedHashSet::new));
+	}
 
-    public void deleteProduct(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
+	@CacheEvict(value = "productListCache", allEntries = true)
+	public void deleteProduct(Long productId) {
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new GlobalException(ProductErrorCode.PRODUCT_NOT_FOUND));
 
-        product.delete();
+		product.delete();
 
-        productRepository.save(product);
-    }
+		productRepository.save(product);
+	}
 }
