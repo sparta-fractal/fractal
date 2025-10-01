@@ -36,25 +36,12 @@ public class TagControllerV2 {
 		return ApiResponse.success(tags, "태그 목록을 성공적으로 조회하였습니다.");
 	}
 
-	@GetMapping("/{tagId}")
-	public ResponseEntity<ApiResponse<TagProductResponse>> getTag
-		(
-			@PathVariable Long tagId,
-			@PageableDefault(size = 30, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-		) {
-
-		// TagProductServiceV2를 사용하여 기본 조회 (조회수 증가)
-		TagProductResponse tags = tagProductServiceV2.getTag(tagId, pageable);
-
-		return ApiResponse.success(tags, "태그를 조회하였습니다.");
-	}
-
 	/**
 	 * 인증된 사용자용 태그 조회 (어뷰징 방지 기능 적용)
 	 * 동일한 사용자가 같은 태그를 여러 번 조회해도 조회수는 한 번만 증가한다
 	 */
-	@GetMapping("/{tagId}/tracked")
-	public ResponseEntity<ApiResponse<TagProductResponse>> getTagWithTracking
+	@GetMapping("/{tagId}")
+	public ResponseEntity<ApiResponse<TagProductResponse>> getTag
 		(
 			@PathVariable Long tagId,
 			@PageableDefault(size = 30, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
@@ -62,8 +49,8 @@ public class TagControllerV2 {
 		) {
 
 		// 인증된 사용자의 경우 어뷰징 방지 기능 적용
-		TagProductResponse tags = tagProductServiceV2.getTagWithUserTracking(tagId, authUser.id(), pageable);
+		TagProductResponse tags = tagProductServiceV2.getTag(tagId, authUser.id(), pageable);
 
-		return ApiResponse.success(tags, "태그를 조회하였습니다. (조회수 추적됨)");
+		return ApiResponse.success(tags, "태그를 조회하였습니다.");
 	}
 }
