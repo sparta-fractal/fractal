@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sparta.team5.fractal.common.response.ApiResponse;
 import com.sparta.team5.fractal.domain.tag.dto.response.TagProductResponse;
 import com.sparta.team5.fractal.domain.tag.dto.response.TagResponse;
-import com.sparta.team5.fractal.domain.tag.service.TagProductService;
+import com.sparta.team5.fractal.domain.tag.service.TagProductServiceV2;
 import com.sparta.team5.fractal.domain.tag.service.TagService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/tags")
-public class TagController {
+@RequestMapping("/api/v2/tags")
+public class TagControllerV2 {
 
 	private final TagService tagService;
-	private final TagProductService tagProductService;
+	private final TagProductServiceV2 tagProductServiceV2;
 
 	@GetMapping
 	public ResponseEntity<ApiResponse<List<TagResponse>>> getAllTags() {
@@ -41,7 +41,7 @@ public class TagController {
 			@PageableDefault(size = 30, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
 		) {
 
-		TagProductResponse tags = tagProductService.getTag(tagId, pageable);
+		TagProductResponse tags = tagProductServiceV2.getTag(tagId, pageable);
 
 		return ApiResponse.success(tags, "태그를 조회하였습니다.");
 	}
