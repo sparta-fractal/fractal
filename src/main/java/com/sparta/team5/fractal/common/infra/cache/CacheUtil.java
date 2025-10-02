@@ -1,7 +1,7 @@
-package com.sparta.team5.fractal.common.cache;
+package com.sparta.team5.fractal.common.infra.cache;
 
-import com.sparta.team5.fractal.common.exception.CommonErrorCode;
-import com.sparta.team5.fractal.common.exception.GlobalException;
+import com.sparta.team5.fractal.common.core.exception.CommonErrorCode;
+import com.sparta.team5.fractal.common.core.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;

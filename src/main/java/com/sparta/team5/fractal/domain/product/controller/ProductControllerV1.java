@@ -1,6 +1,6 @@
 package com.sparta.team5.fractal.domain.product.controller;
 
-import com.sparta.team5.fractal.common.response.ApiResponse;
+import com.sparta.team5.fractal.common.core.dto.ApiResponse;
 import com.sparta.team5.fractal.domain.product.dto.ProductCreateRequest;
 import com.sparta.team5.fractal.domain.product.dto.ProductListResponse;
 import com.sparta.team5.fractal.domain.product.dto.ProductResponse;

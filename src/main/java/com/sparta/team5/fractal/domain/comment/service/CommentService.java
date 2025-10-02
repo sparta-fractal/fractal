@@ -1,6 +1,6 @@
 package com.sparta.team5.fractal.domain.comment.service;
 
-import com.sparta.team5.fractal.common.exception.GlobalException;
+import com.sparta.team5.fractal.common.core.exception.GlobalException;
 import com.sparta.team5.fractal.domain.comment.dto.request.CommentRequest;
 import com.sparta.team5.fractal.domain.comment.dto.response.CommentResponse;
 import com.sparta.team5.fractal.domain.comment.entity.Comment;

@@ -1,4 +1,4 @@
-package com.sparta.team5.fractal.common.entity;
+package com.sparta.team5.fractal.common.core.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

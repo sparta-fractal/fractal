@@ -1,13 +1,12 @@
-package com.sparta.team5.fractal.common.config;
+package com.sparta.team5.fractal.common.infra.security;
 
-import com.sparta.team5.fractal.common.exception.CommonErrorCode;
-import com.sparta.team5.fractal.common.exception.GlobalException;
+import com.sparta.team5.fractal.common.core.exception.CommonErrorCode;
+import com.sparta.team5.fractal.common.core.exception.GlobalException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.*;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.sparta.team5.fractal.common.config;
+package com.sparta.team5.fractal.common.infra.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
