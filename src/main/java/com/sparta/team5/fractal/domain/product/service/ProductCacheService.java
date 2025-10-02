@@ -5,7 +5,6 @@ import com.sparta.team5.fractal.domain.product.dto.ProductListResponse;
 import com.sparta.team5.fractal.domain.search.service.SearchServiceApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.Cache;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,9 +26,7 @@ public class ProductCacheService {
      */
     public void refreshTopKeywordProductCache() {
 
-        Cache cache = cacheUtil.getRequiredCache("products");
-
-        cache.clear();
+        cacheUtil.clearCache("products");
 
         List<String> keywords = searchServiceApi.getTopTenKeywords();
 
@@ -38,8 +35,7 @@ public class ProductCacheService {
         keywords.forEach(keyword -> {
             ProductListResponse products = productServiceV2.getProductsByKeywordV2(pageable, keyword);
 
-
-            cache.put(keyword, products);
+            cacheUtil.put("products", keyword, products);
 
             log.info("Cache Evicted products for: {}", keyword);
         });
