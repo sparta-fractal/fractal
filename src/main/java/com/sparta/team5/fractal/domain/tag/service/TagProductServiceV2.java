@@ -61,7 +61,7 @@ public class TagProductServiceV2 {
 
     // 헬퍼 메서드
     // 캐시의 조회수 증가 메서드
-    public void increaseCacheViewCount(Long tagId) {
+    private void increaseCacheViewCount(Long tagId) {
 
         // 캐시의 view count를 업데이트 하는 코드
         cacheUtil.put("tagViewCountCache", tagId, getCacheViewCount(tagId) + 1);
