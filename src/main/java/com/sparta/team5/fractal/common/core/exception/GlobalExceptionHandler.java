@@ -1,6 +1,6 @@
-package com.sparta.team5.fractal.common.exception;
+package com.sparta.team5.fractal.common.core.exception;
 
-import com.sparta.team5.fractal.common.response.ApiResponse;
+import com.sparta.team5.fractal.common.core.dto.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,8 +1,8 @@
 package com.sparta.team5.fractal.domain.auth.controller;
 
-import com.sparta.team5.fractal.common.annotation.Auth;
-import com.sparta.team5.fractal.common.dto.AuthUser;
-import com.sparta.team5.fractal.common.response.ApiResponse;
+import com.sparta.team5.fractal.common.core.dto.ApiResponse;
+import com.sparta.team5.fractal.common.core.dto.AuthUser;
+import com.sparta.team5.fractal.common.crosscutting.annotation.Auth;
 import com.sparta.team5.fractal.domain.auth.dto.request.AuthLoginRequest;
 import com.sparta.team5.fractal.domain.auth.dto.request.AuthRegisterRequest;
 import com.sparta.team5.fractal.domain.auth.dto.request.AuthWithdrawRequest;

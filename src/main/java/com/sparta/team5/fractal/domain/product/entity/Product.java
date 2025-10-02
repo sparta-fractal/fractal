@@ -1,6 +1,6 @@
 package com.sparta.team5.fractal.domain.product.entity;
 
-import com.sparta.team5.fractal.common.entity.BaseEntity;
+import com.sparta.team5.fractal.common.core.entity.BaseEntity;
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.tag.entity.Tag;
 import jakarta.persistence.*;
