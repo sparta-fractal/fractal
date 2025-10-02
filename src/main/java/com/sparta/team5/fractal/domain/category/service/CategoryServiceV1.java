@@ -15,7 +15,8 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryService implements CategoryServiceApi {
+@Transactional
+public class CategoryServiceV1 implements CategoryServiceApi {
 
     private final CategoryRepository categoryRepository;
 
@@ -24,36 +25,35 @@ public class CategoryService implements CategoryServiceApi {
 
         List<Category> categories = categoryRepository.findAll();
 
-        return categories.stream()
+        List<CategoryResponse> response = categories.stream()
                 .map(CategoryResponse::from)
                 .toList();
+
+        return response;
     }
 
-    @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest request) {
-        // 중복 카테고리명 체크
-        if (categoryRepository.existsByName(request.name())) {
-            throw new GlobalException(CategoryErrorCode.CATEGORY_NAME_DUPLICATED);
-        }
+
+        validateDuplicateCategoryName(request.name());
 
         Category parentCategory = null;
 
         if (request.parentCategoryId() != null) {
-            parentCategory = categoryRepository.findById(request.parentCategoryId())
-                    .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+            parentCategory = findCategoryOrThrow(request.parentCategoryId());
         }
 
         Category category = Category.of(request.name(), parentCategory);
+
         Category savedCategory = categoryRepository.save(category);
 
-        return CategoryResponse.from(savedCategory);
+        CategoryResponse response = CategoryResponse.from(savedCategory);
+
+        return response;
     }
 
-    @Transactional
     public CategoryResponse updateCategory(Long categoryId, CategoryCreateRequest request) {
 
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+        Category category = findCategoryOrThrow(categoryId);
 
         // 중복 카테고리명 체크 (자기 자신 제외)
         if (!category.getName().equals(request.name()) &&
@@ -63,32 +63,47 @@ public class CategoryService implements CategoryServiceApi {
 
         Category parentCategory = null;
         if (request.parentCategoryId() != null) {
-            parentCategory = categoryRepository.findById(request.parentCategoryId())
-                    .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+            parentCategory = findCategoryOrThrow(request.parentCategoryId());
         }
 
         category.update(request.name(), parentCategory);
+
         Category updatedCategory = categoryRepository.save(category);
 
-        return CategoryResponse.from(updatedCategory);
+        CategoryResponse response = CategoryResponse.from(updatedCategory);
+
+        return response;
     }
 
-    @Transactional
     public void deleteCategory(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+
+        Category category = findCategoryOrThrow(categoryId);
 
         category.delete();
-
-        categoryRepository.save(category);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Category> findById(Long Id) {
-        return categoryRepository.findById(Id);
+
+        Optional<Category> response = categoryRepository.findById(Id);
+
+        return response;
     }
 
+    //헬퍼 메서드
+    private void validateDuplicateCategoryName(String categoryName) {
+
+        if (categoryRepository.existsByName(categoryName)) {
+            throw new GlobalException(CategoryErrorCode.CATEGORY_NAME_DUPLICATED);
+        }
+    }
+
+    private Category findCategoryOrThrow(Long categoryId) {
+
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+
+        return category;
+    }
 }
-
-

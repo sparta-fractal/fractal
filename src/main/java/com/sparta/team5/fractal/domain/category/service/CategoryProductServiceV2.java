@@ -28,15 +28,26 @@ public class CategoryProductServiceV2 {
             key = "'category:' + #categoryId + ':page:' + #pageable.pageNumber + ':size:' + #pageable.pageSize + ':sort:' + #pageable.sort"
     )
     public CategoryProductResponse getCategory(Long categoryId, Pageable pageable) {
+        
         log.debug("Cache miss for categoryId: {}, pageable: {}", categoryId, pageable);
 
-        Category category = categoryServiceApi.findById(categoryId)
-                .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+        Category category = findCategoryOrThrow(categoryId);
 
         Page<Product> productPage = productServiceApi.findProductsByCategoryId(categoryId, pageable);
 
         Page<ProductSimpleResponse> productDtoPage = productPage.map(ProductSimpleResponse::from);
 
-        return CategoryProductResponse.from(category, productDtoPage);
+        CategoryProductResponse response = CategoryProductResponse.from(category, productDtoPage);
+
+        return response;
+    }
+
+    // 헬퍼 메서드
+    private Category findCategoryOrThrow(Long categoryId) {
+
+        Category category = categoryServiceApi.findById(categoryId)
+                .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+
+        return category;
     }
 }

@@ -15,21 +15,29 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryProductService {
+public class CategoryProductServiceV1 {
 
     private final ProductServiceApi productServiceApi;
     private final CategoryServiceApi categoryServiceApi;
 
     @Transactional(readOnly = true)
-    public CategoryProductResponse getCategory(Long categoryId, Pageable pageable) {
+    public CategoryProductResponse getProductsByCategoryId(Long categoryId, Pageable pageable) {
 
-        Category category = categoryServiceApi.findById(categoryId)
-                .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+        Category category = findCategoryOrThrow(categoryId);
 
         Page<Product> productPage = productServiceApi.findProductsByCategoryId(categoryId, pageable);
 
         Page<ProductSimpleResponse> productDtoPage = productPage.map(ProductSimpleResponse::from);
 
         return CategoryProductResponse.from(category, productDtoPage);
+    }
+
+    // 헬퍼 메서드
+    private Category findCategoryOrThrow(Long categoryId) {
+
+        Category category = categoryServiceApi.findById(categoryId)
+                .orElseThrow(() -> new GlobalException(CategoryErrorCode.CATEGORY_NOT_FOUND));
+
+        return category;
     }
 }

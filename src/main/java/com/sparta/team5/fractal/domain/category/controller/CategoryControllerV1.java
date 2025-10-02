@@ -4,8 +4,8 @@ import com.sparta.team5.fractal.common.core.dto.ApiResponse;
 import com.sparta.team5.fractal.domain.category.dto.CategoryCreateRequest;
 import com.sparta.team5.fractal.domain.category.dto.CategoryProductResponse;
 import com.sparta.team5.fractal.domain.category.dto.CategoryResponse;
-import com.sparta.team5.fractal.domain.category.service.CategoryProductService;
-import com.sparta.team5.fractal.domain.category.service.CategoryService;
+import com.sparta.team5.fractal.domain.category.service.CategoryProductServiceV1;
+import com.sparta.team5.fractal.domain.category.service.CategoryServiceV1;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +18,10 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class CategoryController {
+public class CategoryControllerV1 {
 
-    private final CategoryService categoryService;
-    private final CategoryProductService categoryProductService;
+    private final CategoryServiceV1 categoryService;
+    private final CategoryProductServiceV1 categoryProductService;
 
     /**
      * 모든 카테고리 조회
@@ -37,12 +37,11 @@ public class CategoryController {
     }
 
     @GetMapping("/api/v1/categories/{categoryId}")
-    public ResponseEntity<ApiResponse<CategoryProductResponse>> getCategory(
+    public ResponseEntity<ApiResponse<CategoryProductResponse>> getProductsByCategoryId(
             @PathVariable Long categoryId,
-            @PageableDefault(size = 30, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
+            @PageableDefault(size = 30, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        CategoryProductResponse category = categoryProductService.getCategory(categoryId, pageable);
+        CategoryProductResponse category = categoryProductService.getProductsByCategoryId(categoryId, pageable);
 
         return ApiResponse.success(category, "카테고리를 조회하였습니다.");
     }
