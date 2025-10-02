@@ -1,4 +1,4 @@
-package com.sparta.team5.fractal.common.config;
+package com.sparta.team5.fractal.common.infra.scheduler;
 
 import com.sparta.team5.fractal.domain.product.service.ProductCacheService;
 import lombok.RequiredArgsConstructor;

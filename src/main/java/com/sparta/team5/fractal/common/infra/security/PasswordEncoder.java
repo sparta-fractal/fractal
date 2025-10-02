@@ -1,4 +1,4 @@
-package com.sparta.team5.fractal.common.config;
+package com.sparta.team5.fractal.common.infra.security;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;

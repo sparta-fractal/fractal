@@ -1,4 +1,4 @@
-package com.sparta.team5.fractal.common.exception;
+package com.sparta.team5.fractal.common.core.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

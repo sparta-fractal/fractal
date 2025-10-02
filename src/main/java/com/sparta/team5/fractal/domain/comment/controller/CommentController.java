@@ -1,9 +1,9 @@
 package com.sparta.team5.fractal.domain.comment.controller;
 
-import com.sparta.team5.fractal.common.annotation.Auth;
-import com.sparta.team5.fractal.common.dto.AuthUser;
-import com.sparta.team5.fractal.common.response.ApiPageResponse;
-import com.sparta.team5.fractal.common.response.ApiResponse;
+import com.sparta.team5.fractal.common.core.dto.ApiPageResponse;
+import com.sparta.team5.fractal.common.core.dto.ApiResponse;
+import com.sparta.team5.fractal.common.core.dto.AuthUser;
+import com.sparta.team5.fractal.common.crosscutting.annotation.Auth;
 import com.sparta.team5.fractal.domain.comment.dto.request.CommentRequest;
 import com.sparta.team5.fractal.domain.comment.dto.response.CommentResponse;
 import com.sparta.team5.fractal.domain.comment.service.CommentService;
@@ -13,11 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor

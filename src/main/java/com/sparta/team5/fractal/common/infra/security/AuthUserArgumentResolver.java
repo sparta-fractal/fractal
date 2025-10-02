@@ -1,9 +1,9 @@
-package com.sparta.team5.fractal.common.config;
+package com.sparta.team5.fractal.common.infra.security;
 
-import com.sparta.team5.fractal.common.annotation.Auth;
-import com.sparta.team5.fractal.common.dto.AuthUser;
-import com.sparta.team5.fractal.common.exception.CommonErrorCode;
-import com.sparta.team5.fractal.common.exception.GlobalException;
+import com.sparta.team5.fractal.common.core.dto.AuthUser;
+import com.sparta.team5.fractal.common.core.exception.CommonErrorCode;
+import com.sparta.team5.fractal.common.core.exception.GlobalException;
+import com.sparta.team5.fractal.common.crosscutting.annotation.Auth;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;

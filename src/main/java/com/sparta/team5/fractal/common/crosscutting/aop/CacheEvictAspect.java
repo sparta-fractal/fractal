@@ -1,4 +1,4 @@
-package com.sparta.team5.fractal.common.aop;
+package com.sparta.team5.fractal.common.crosscutting.aop;
 
 import com.sparta.team5.fractal.domain.product.service.ProductCacheService;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.sparta.team5.fractal.common.annotation;
+package com.sparta.team5.fractal.common.crosscutting.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
