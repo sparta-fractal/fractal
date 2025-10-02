@@ -99,7 +99,7 @@ public class TagProductServiceV2 {
     }
 
     // 캐시의 조회수 조회 메서드
-    public Integer getCacheViewCount(Long tagId) {
+    private Integer getCacheViewCount(Long tagId) {
 
         Integer originViewCount = cacheUtil.get("tagViewCountCache", tagId, Integer.class);
 
