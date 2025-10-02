@@ -78,7 +78,7 @@ Spring Cache를 활용한 성능 최적화에 중점을 두고 있습니다.
 
 ### Backend
 - **Language**: Java 17
-- **Framework**: Spring Boot 3.x
+- **Framework**: Spring Boot 3.5.6
 - **ORM**: Spring Data JPA
 - **Database**: MySQL 8.0 (Production), H2 (Test)
 - **Cache**: Spring Cache + Caffeine 3.1.8
@@ -94,32 +94,228 @@ Spring Cache를 활용한 성능 최적화에 중점을 두고 있습니다.
 
 프로젝트는 크게 **common**과 **domain** 두 개의 최상위 패키지로 구성됩니다.
 
-- **common**: 여러 도메인에서 공통적으로 사용되는 클래스 관리
-  - 보안 설정, 공통 응답 DTO, 전역 예외 처리 등
-- **domain**: 실제 비즈니스 로직을 처리하는 도메인별 패키지 관리
-  - 각 도메인은 독립적으로 Controller, Service, Repository, Entity, DTO 등으로 구성
+- **common**: 계층별로 구분된 공통 관심사
+  - core: 핵심 비즈니스 로직 (DTO, Entity, Exception)
+  - crosscutting: 횡단 관심사 (AOP, Annotation)
+  - infra: 인프라스트럭처 계층 (Cache, Security, JPA, Web)
+- **domain**: 도메인 주도 설계(DDD) 기반 비즈니스 로직
+
+각 도메인은 독립적으로 Controller, Service, Repository, Entity, DTO로 구성
 
 ```
 fractal/
-├── FractalApplication.java
+│
 ├── common/
-│   ├── annotation/
-│   ├── aop/
-│   ├── config/
-│   ├── dto/
-│   ├── entity/
-│   ├── exception/
-│   ├── security/
-│   ├── type/
-│   └── cache/
-└── domain/
-    ├── auth/
-    ├── category/
-    ├── comment/
-    ├── product/
-    ├── search/
-    ├── tag/
-    └── user/
+│   │
+│   ├── core/
+│   │   ├── dto/
+│   │   │   ├── ApiPageResponse.java
+│   │   │   ├── ApiResponse.java
+│   │   │   └── AuthUser.java
+│   │   │
+│   │   ├── entity/
+│   │   │   └── BaseEntity.java
+│   │   │
+│   │   └── exception/
+│   │       ├── CommonErrorCode.java
+│   │       ├── ErrorCode.java
+│   │       ├── GlobalException.java
+│   │       └── GlobalExceptionHandler.java
+│   │
+│   ├── crosscutting/
+│   │   ├── annotation/
+│   │   │   └── Auth.java
+│   │   │
+│   │   └── aop/
+│   │       └── CacheEvictAspect.java
+│   │
+│   └── infra/
+│       ├── cache/
+│       │   ├── CacheConfig.java
+│       │   └── CacheUtil.java
+│       │
+│       ├── jpa/
+│       │   └── JpaAuditingConfig.java
+│       │
+│       ├── scheduler/
+│       │   └── SchedulerConfig.java
+│       │
+│       ├── security/
+│       │   ├── AuthUserArgumentResolver.java
+│       │   ├── JwtFilter.java
+│       │   ├── JwtUtil.java
+│       │   └── PasswordEncoder.java
+│       │
+│       └── web/
+│           ├── FilterConfig.java
+│           └── WebConfig.java
+│
+├── domain/
+│   │
+│   ├── auth/
+│   │   ├── controller/
+│   │   │   └── AuthController.java
+│   │   │
+│   │   ├── dto/
+│   │   │   ├── request/
+│   │   │   │   ├── AuthLoginRequest.java
+│   │   │   │   ├── AuthRegisterRequest.java
+│   │   │   │   └── AuthWithdrawRequest.java
+│   │   │   │
+│   │   │   └── response/
+│   │   │       └── AuthResponse.java
+│   │   │
+│   │   ├── exception/
+│   │   │   └── AuthErrorCode.java
+│   │   │
+│   │   └── service/
+│   │       ├── AuthService.java
+│   │       └── AuthServiceApi.java
+│   │
+│   ├── category/
+│   │   ├── controller/
+│   │   │   ├── CategoryControllerV1.java
+│   │   │   └── CategoryControllerV2.java
+│   │   │
+│   │   ├── dto/
+│   │   │   ├── CategoryCreateRequest.java
+│   │   │   ├── CategoryMapper.java
+│   │   │   ├── CategoryProductResponse.java
+│   │   │   └── CategoryResponse.java
+│   │   │
+│   │   ├── entity/
+│   │   │   └── Category.java
+│   │   │
+│   │   ├── exception/
+│   │   │   └── CategoryErrorCode.java
+│   │   │
+│   │   ├── repository/
+│   │   │   └── CategoryRepository.java
+│   │   │
+│   │   └── service/
+│   │       ├── CategoryProductServiceV1.java
+│   │       ├── CategoryProductServiceV2.java
+│   │       ├── CategoryServiceApi.java
+│   │       ├── CategoryServiceV1.java
+│   │       └── CategoryServiceV2.java
+│   │
+│   ├── comment/
+│   │   ├── controller/
+│   │   │   └── CommentController.java
+│   │   │
+│   │   ├── dto/
+│   │   │   ├── request/
+│   │   │   │   └── CommentRequest.java
+│   │   │   │
+│   │   │   └── response/
+│   │   │       └── CommentResponse.java
+│   │   │
+│   │   ├── entity/
+│   │   │   └── Comment.java
+│   │   │
+│   │   ├── repository/
+│   │   │   └── CommentRepository.java
+│   │   │
+│   │   └── service/
+│   │       ├── CommentService.java
+│   │       └── CommentServiceApi.java
+│   │
+│   ├── product/
+│   │   ├── controller/
+│   │   │   ├── ProductControllerV1.java
+│   │   │   └── ProductControllerV2.java
+│   │   │
+│   │   ├── dto/
+│   │   │   ├── ProductCreateRequest.java
+│   │   │   ├── ProductListResponse.java
+│   │   │   ├── ProductResponse.java
+│   │   │   ├── ProductSimpleResponse.java
+│   │   │   └── ProductUpdateRequest.java
+│   │   │
+│   │   ├── entity/
+│   │   │   ├── Product.java
+│   │   │   ├── ProductCategory.java
+│   │   │   └── ProductTag.java
+│   │   │
+│   │   ├── exception/
+│   │   │   └── ProductErrorCode.java
+│   │   │
+│   │   ├── repository/
+│   │   │   └── ProductRepository.java
+│   │   │
+│   │   └── service/
+│   │       ├── ProductCacheService.java
+│   │       ├── ProductServiceApi.java
+│   │       ├── ProductServiceV1.java
+│   │       └── ProductServiceV2.java
+│   │
+│   ├── search/
+│   │   ├── entity/
+│   │   │   └── Search.java
+│   │   │
+│   │   ├── repository/
+│   │   │   └── SearchRepository.java
+│   │   │
+│   │   └── service/
+│   │       ├── SearchService.java
+│   │       └── SearchServiceApi.java
+│   │
+│   ├── tag/
+│   │   ├── controller/
+│   │   │   ├── TagControllerV1.java
+│   │   │   └── TagControllerV2.java
+│   │   │
+│   │   ├── dto/
+│   │   │   └── response/
+│   │   │       ├── TagProductResponse.java
+│   │   │       └── TagResponse.java
+│   │   │
+│   │   ├── entity/
+│   │   │   └── Tag.java
+│   │   │
+│   │   ├── exception/
+│   │   │   └── TagErrorCode.java
+│   │   │
+│   │   ├── repository/
+│   │   │   └── TagRepository.java
+│   │   │
+│   │   └── service/
+│   │       ├── TagCacheService.java
+│   │       ├── TagProductServiceV1.java
+│   │       ├── TagProductServiceV2.java
+│   │       ├── TagService.java
+│   │       └── TagServiceApi.java
+│   │
+│   └── user/
+│       ├── constant/
+│       │   └── SuccessMessages.java
+│       │
+│       ├── controller/
+│       │   └── UserController.java
+│       │
+│       ├── dto/
+│       │   ├── request/
+│       │   │   ├── UpdatePasswordRequest.java
+│       │   │   └── UpdateUserProfileRequest.java
+│       │   │
+│       │   └── response/
+│       │       ├── UpdatePasswordResponse.java
+│       │       └── UpdateUserProfileResponse.java
+│       │
+│       ├── entity/
+│       │   └── User.java
+│       │
+│       ├── exception/
+│       │   └── UserErrorCode.java
+│       │
+│       ├── repository/
+│       │   └── UserRepository.java
+│       │
+│       └── service/
+│           ├── UserService.java
+│           └── UserServiceApi.java
+│
+└── FractalApplication.java
 ```
 
 ## 📚 API 명세
