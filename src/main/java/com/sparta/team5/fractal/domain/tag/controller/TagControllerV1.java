@@ -1,6 +1,6 @@
 package com.sparta.team5.fractal.domain.tag.controller;
 
-import com.sparta.team5.fractal.common.response.ApiResponse;
+import com.sparta.team5.fractal.common.core.dto.ApiResponse;
 import com.sparta.team5.fractal.domain.tag.dto.response.TagProductResponse;
 import com.sparta.team5.fractal.domain.tag.dto.response.TagResponse;
 import com.sparta.team5.fractal.domain.tag.service.TagProductServiceV1;
