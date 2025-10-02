@@ -1,16 +1,17 @@
 package com.sparta.team5.fractal.domain.category.service;
 
-import com.sparta.team5.fractal.common.exception.GlobalException;
+import com.sparta.team5.fractal.common.core.exception.GlobalException;
 import com.sparta.team5.fractal.domain.category.dto.CategoryCreateRequest;
 import com.sparta.team5.fractal.domain.category.dto.CategoryResponse;
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
 import com.sparta.team5.fractal.domain.category.repository.CategoryRepository;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

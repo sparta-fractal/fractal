@@ -1,4 +1,4 @@
-package com.sparta.team5.fractal.common.response;
+package com.sparta.team5.fractal.common.core.dto;
 
 import lombok.Builder;
 import org.springframework.data.domain.Page;

@@ -1,6 +1,6 @@
 package com.sparta.team5.fractal.domain.product.service;
 
-import com.sparta.team5.fractal.common.exception.GlobalException;
+import com.sparta.team5.fractal.common.core.exception.GlobalException;
 import com.sparta.team5.fractal.domain.category.entity.Category;
 import com.sparta.team5.fractal.domain.category.exception.CategoryErrorCode;
 import com.sparta.team5.fractal.domain.category.service.CategoryServiceApi;
