@@ -1,6 +1,6 @@
 package com.sparta.team5.fractal.domain.tag.service;
 
-import com.sparta.team5.fractal.common.core.exception.GlobalException;
+import com.sparta.team5.fractal.common.exception.GlobalException;
 import com.sparta.team5.fractal.domain.product.dto.ProductSimpleResponse;
 import com.sparta.team5.fractal.domain.product.entity.Product;
 import com.sparta.team5.fractal.domain.product.service.ProductServiceApi;
@@ -15,13 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class TagProductService {
+public class TagProductServiceV1 {
 
     private final ProductServiceApi productServiceApi;
     private final TagServiceApi tagServiceApi;
 
     @Transactional
-    public TagProductResponse getTag(Long tagId, Pageable pageable) {
+    public TagProductResponse getProductsByTagId(Long tagId, Pageable pageable) {
+
         Tag tag = tagServiceApi.findById(tagId)
                 .orElseThrow(() -> new GlobalException(TagErrorCode.TAG_NOT_FOUND));
 
@@ -31,6 +32,8 @@ public class TagProductService {
 
         Page<ProductSimpleResponse> productDtoPage = productPage.map(ProductSimpleResponse::from);
 
-        return TagProductResponse.from(tag, productDtoPage);
+        TagProductResponse response = TagProductResponse.from(tag, productDtoPage);
+
+        return response;
     }
 }
