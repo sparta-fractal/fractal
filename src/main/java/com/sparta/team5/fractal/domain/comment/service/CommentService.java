@@ -36,9 +36,9 @@ public class CommentService implements CommentServiceApi {
 
         Comment comment = Comment.of(request.content(), user, product);
 
-        commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
 
-        return CommentResponse.from(comment);
+        return CommentResponse.from(savedComment);
     }
 
     @Transactional(readOnly = true)
