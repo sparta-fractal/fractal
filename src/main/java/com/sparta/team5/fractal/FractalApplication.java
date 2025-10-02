@@ -9,5 +9,4 @@ public class FractalApplication {
     public static void main(String[] args) {
         SpringApplication.run(FractalApplication.class, args);
     }
-
 }

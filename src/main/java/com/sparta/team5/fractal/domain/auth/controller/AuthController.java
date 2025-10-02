@@ -1,0 +1,56 @@
+package com.sparta.team5.fractal.domain.auth.controller;
+
+import com.sparta.team5.fractal.common.core.dto.ApiResponse;
+import com.sparta.team5.fractal.common.core.dto.AuthUser;
+import com.sparta.team5.fractal.common.crosscutting.annotation.Auth;
+import com.sparta.team5.fractal.domain.auth.dto.request.AuthLoginRequest;
+import com.sparta.team5.fractal.domain.auth.dto.request.AuthRegisterRequest;
+import com.sparta.team5.fractal.domain.auth.dto.request.AuthWithdrawRequest;
+import com.sparta.team5.fractal.domain.auth.dto.response.AuthResponse;
+import com.sparta.team5.fractal.domain.auth.service.AuthService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthService authService;
+
+    @PostMapping("/signup")
+    public ResponseEntity<ApiResponse<Void>> register(
+            @Valid @RequestBody AuthRegisterRequest authRegisterRequest
+    ) {
+
+        authService.register(authRegisterRequest);
+
+        return ApiResponse.success(null, "회원가입 성공");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<AuthResponse>> login(
+            @Valid @RequestBody AuthLoginRequest authLoginRequest
+    ) {
+
+        AuthResponse authResponse = authService.login(authLoginRequest);
+
+        return ApiResponse.success(authResponse, "토큰 발급 성공");
+    }
+
+    @PostMapping("/withdraw")
+    public ResponseEntity<ApiResponse<Void>> withdraw(
+            @Auth AuthUser authUser,
+            @Valid @RequestBody AuthWithdrawRequest authWithdrawRequest
+    ) {
+
+        authService.withdraw(authUser, authWithdrawRequest);
+
+        return ApiResponse.success(null, "회원탈퇴 성공");
+    }
+}
