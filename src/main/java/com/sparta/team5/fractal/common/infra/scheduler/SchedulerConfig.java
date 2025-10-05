@@ -17,8 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class SchedulerConfig {
 
     private final ProductCacheService productCacheService;
-
-    // 밀리초 단위로 계산
+    
     @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.MINUTES)
     @Transactional(readOnly = true)
     public void productCacheEvict() {
