@@ -8,6 +8,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.concurrent.TimeUnit;
+
 @Slf4j
 @Configuration
 @EnableScheduling
@@ -15,9 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class SchedulerConfig {
 
     private final ProductCacheService productCacheService;
-
-    // 밀리초 단위로 계산
-    @Scheduled(fixedRate = 60000)
+    
+    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.MINUTES)
     @Transactional(readOnly = true)
     public void productCacheEvict() {
 
